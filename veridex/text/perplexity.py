@@ -1,10 +1,17 @@
 from typing import Any
+import math
 from veridex.core.signal import BaseSignal, DetectionResult
 
 class PerplexitySignal(BaseSignal):
     """
-    Calculates the perplexity of the text using a pre-trained language model (e.g. GPT-2).
-    Requires 'transformers' and 'torch' to be installed.
+    Calculates the perplexity and burstiness of the text using a pre-trained language model (e.g. GPT-2).
+
+    Perplexity measures the 'surprise' of the text.
+    Burstiness measures the variation of perplexity across sentences.
+
+    Low Perplexity + Low Burstiness => Higher probability of being AI-generated.
+
+    Requires 'transformers', 'torch', and 'nltk' (optional, for sentence splitting) to be installed.
     """
 
     def __init__(self, model_id: str = "gpt2"):
@@ -14,7 +21,7 @@ class PerplexitySignal(BaseSignal):
 
     @property
     def name(self) -> str:
-        return "perplexity"
+        return "perplexity_burstiness"
 
     @property
     def dtype(self) -> str:
@@ -48,6 +55,19 @@ class PerplexitySignal(BaseSignal):
         self._device = device
         self._tokenizer = AutoTokenizer.from_pretrained(self.model_id)
         self._model = AutoModelForCausalLM.from_pretrained(self.model_id).to(device)
+
+    def _split_sentences(self, text: str) -> list[str]:
+        try:
+            import nltk
+            try:
+                nltk.data.find('tokenizers/punkt')
+            except LookupError:
+                nltk.download('punkt', quiet=True)
+            return nltk.sent_tokenize(text)
+        except ImportError:
+            # Fallback to simple splitting if nltk is not available
+            import re
+            return re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
 
     def run(self, input_data: Any) -> DetectionResult:
         if not isinstance(input_data, str):
@@ -84,21 +104,65 @@ class PerplexitySignal(BaseSignal):
             )
 
         import torch
+        import numpy as np
 
         try:
-            inputs = self._tokenizer(input_data, return_tensors="pt")
-            inputs = {k: v.to(self._device) for k, v in inputs.items()}
+            sentences = self._split_sentences(input_data)
+            # If no sentences found (e.g. empty or weird text), treat whole text as one
+            if not sentences:
+                sentences = [input_data]
 
-            with torch.no_grad():
-                outputs = self._model(**inputs, labels=inputs["input_ids"])
-                loss = outputs.loss
-                perplexity = torch.exp(loss).item()
+            perplexities = []
+
+            for sentence in sentences:
+                # Skip empty sentences
+                if not sentence.strip():
+                    continue
+
+                inputs = self._tokenizer(sentence, return_tensors="pt")
+                inputs = {k: v.to(self._device) for k, v in inputs.items()}
+
+                with torch.no_grad():
+                    outputs = self._model(**inputs, labels=inputs["input_ids"])
+                    loss = outputs.loss
+                    ppl = torch.exp(loss).item()
+                    perplexities.append(ppl)
+
+            if not perplexities:
+                 return DetectionResult(
+                    score=0.0,
+                    confidence=0.0,
+                    metadata={},
+                    error="Could not calculate perplexity for any sentence."
+                )
+
+            mean_perplexity = float(np.mean(perplexities))
+            burstiness = float(np.std(perplexities)) if len(perplexities) > 1 else 0.0
+
+            # Heuristic Scoring (Experimental)
+            # Research suggests AI text has lower perplexity and lower burstiness.
+            # We define a simple probability mapping.
+            # Note: Thresholds are arbitrary and need calibration on real datasets.
+            # GPT-2 Output approx: PPL ~ 10-20. Human: PPL ~ 40-100+.
+
+            # Simple logistic-like decay for score based on PPL
+            # If PPL is low (<30), probability of AI is high.
+            # If PPL is high (>80), probability of AI is low.
+
+            # We use a threshold of 50 for perplexity as a midpoint.
+            ppl_score = 1.0 / (1.0 + math.exp((mean_perplexity - 50) / 10))
+
+            # Burstiness acts as a modifier? Or just a separate signal?
+            # For now, let's keep the score based mainly on Perplexity but return both metrics.
+            # AI = Low Burstiness.
 
             return DetectionResult(
-                score=0.5, # Again, raw metric without calibration
-                confidence=0.0,
+                score=ppl_score,
+                confidence=0.6, # Moderate confidence as this is a heuristic
                 metadata={
-                    "perplexity": perplexity,
+                    "mean_perplexity": mean_perplexity,
+                    "burstiness": burstiness,
+                    "sentence_count": len(sentences),
                     "model_id": self.model_id
                 }
             )
@@ -108,5 +172,5 @@ class PerplexitySignal(BaseSignal):
                 score=0.0,
                 confidence=0.0,
                 metadata={},
-                error=f"Error calculating perplexity: {e}"
+                error=f"Error calculating perplexity/burstiness: {e}"
             )

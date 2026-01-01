@@ -97,6 +97,7 @@ Each signal:
 **Phase 3 (Optional)**
 
 * Video (frame-based analysis)
+* Audio (waveform/spectrogram analysis)
 
 ---
 
@@ -126,36 +127,43 @@ The system MUST return structured, interpretable output.
 
 ### 5.3 Detection Signals (Text)
 
-#### Required Signal Categories
+#### 1. Statistical & Zero-Shot Methods
+*   **Perplexity & Burstiness**: The baseline metric. Measures "surprise" (entropy) and its variance over sentences. Low perplexity + low burstiness = high AI probability.
+*   **Binoculars**: A contrastive method using two models (Performer vs. Observer) to calculate a score ratio. State-of-the-art zero-shot detection.
+*   **Fast-DetectGPT**: Analyzes the conditional probability curvature of the text. Efficient zero-shot detection.
+*   **Zlib Entropy**: A simple compression-based baseline.
 
-1. **Perplexity-Based Signals**
+#### 2. Watermarking & Active Detection
+*   **SynthID**: Detects watermarks embedded by Google DeepMind's models (Gemini, etc.) via logits processing.
 
-   * Single-model perplexity
-   * Cross-model perplexity gap
-   * Sliding-window variance
-
-2. **Stylometric Signals**
-
-   * Sentence length distribution
-   * Burstiness and entropy
-   * POS tag ratios
-   * Function word frequency
-
-3. **Compression & Redundancy Signals**
-
-   * Compression ratio
-   * n-gram repetition
-   * Token saturation
-
-Each signal MUST:
-
-* Output a normalized score
-* Declare when it is unreliable
-* Be independently testable
+#### 3. Stylometric Signals
+*   **Sentence length distribution**
+*   **POS tag ratios**
 
 ---
 
-### 5.4 Fusion & Scoring
+### 5.4 Detection Signals (Image)
+
+#### 1. Frequency Domain
+*   **Spectral Analysis**: Detecting anomalous high-frequency decay (roll-off) typical of diffusion upsampling.
+*   **FreqCross**: Fusing spatial and frequency features (Future).
+
+#### 2. Reconstruction & Artifacts
+*   **DIRE (Diffusion Reconstruction Error)**: Measures the error when re-passing the image through a diffusion model. AI images reconstruct better (lower error).
+
+#### 3. Watermarking
+*   **Invisible-Watermark**: Decoding DWT/DCT watermarks (e.g., Stable Diffusion tags).
+*   **Stable Signature**: Latent watermarking detection.
+
+---
+
+### 5.5 Provenance (All Modalities)
+
+*   **C2PA Manifests**: Cryptographically verifying the history of the asset using `c2pa-python`. This is the "Gold Standard" for provenance.
+
+---
+
+### 5.6 Fusion & Scoring
 
 The system MUST:
 
@@ -165,23 +173,6 @@ The system MUST:
 * Expose raw and calibrated scores
 
 Initial fusion may be heuristic-based; learned fusion is optional and experimental.
-
----
-
-### 5.5 Evaluation & Benchmarking
-
-The system MUST support:
-
-* Multiple datasets
-* Human-only vs AI-only vs human-edited AI samples
-* Domain-shift testing
-* Stress testing (short text, paraphrasing)
-
-Required metrics:
-
-* AUROC
-* Calibration error (ECE)
-* False positive rate at fixed thresholds
 
 ---
 
@@ -205,9 +196,9 @@ Required metrics:
 
 ### 6.4 Performance
 
-* Text detection should run on CPU
-* Optional GPU acceleration for heavy models
-* Reasonable latency for API use (<500ms for text)
+* Text detection should run on CPU where possible.
+* Heavy models (Binoculars, DIRE) should be optional dependencies.
+* Reasonable latency for API use (<500ms for lightweight, <5s for heavy).
 
 ---
 
@@ -216,20 +207,24 @@ Required metrics:
 ### 7.1 Module Layout
 
 ```
-ai_content_detection/
+veridex/
 ├── core/
 │   ├── signal.py          # Base signal interface
 │   ├── fusion.py          # Score aggregation logic
 │   ├── calibration.py     # Confidence estimation
+│   ├── provenance.py      # C2PA and metadata checks
 │
 ├── text/
-│   ├── perplexity.py
-│   ├── stylometry.py
-│   ├── compression.py
+│   ├── perplexity.py      # Perplexity + Burstiness
+│   ├── binoculars.py      # Binoculars (Contrastive)
+│   ├── fast_detectgpt.py  # Fast-DetectGPT
+│   ├── synthid.py         # SynthID wrapper
+│   ├── entropy.py         # Zlib entropy
 │
 ├── image/
-│   ├── frequency.py
-│   ├── diffusion.py
+│   ├── frequency.py       # Spectral analysis
+│   ├── dire.py            # Diffusion Reconstruction
+│   ├── watermarks.py      # Invisible-Watermark / Stable Signature
 │
 ├── evaluation/
 │   ├── datasets.py
@@ -246,19 +241,6 @@ ai_content_detection/
 │
 └── examples/
 ```
-
----
-
-### 7.2 Signal Interface (Conceptual)
-
-Each signal implements:
-
-* `is_applicable(input)`
-* `extract_features(input)`
-* `score(features)`
-* `known_failure_modes()`
-
-This enforces consistency and interpretability.
 
 ---
 
@@ -288,23 +270,31 @@ The system MUST surface these explicitly.
 
 ## 10. Development Phases
 
-### Phase 1 — Text Detection (MVP)
+### Phase 1 — Text Detection Core (MVP)
 
-* Core architecture
-* 3–4 signal types
-* Evaluation framework
-* OSS release
+* Core architecture (Done)
+* Basic Signals: Zlib Entropy, Perplexity (Done)
+* **New**: Burstiness (Upgrade Perplexity)
+* **New**: Binoculars (High fidelity zero-shot)
 
-### Phase 2 — Image Detection
+### Phase 2 — Image & Provenance
 
-* Frequency-domain signals
-* Diffusion artifact analysis
+* Image Frequency Analysis (Done)
+* DIRE (Done)
+* **New**: C2PA Integration (Provenance)
+* **New**: Image Watermarking decoding
 
-### Phase 3 — Advanced Research
+### Phase 3 — Advanced Text & Video
 
-* Video analysis
-* Learned fusion
+* Fast-DetectGPT
+* SynthID Integration
+* Video rPPG (Physiological signals)
+
+### Phase 4 — Research & Hardening
+
 * Adversarial robustness studies
+* Learned fusion models
+* Audio detection (AASIST)
 
 ---
 
@@ -317,16 +307,5 @@ The project is successful if:
 * External contributors can add new signals
 * The library is adopted or referenced in real systems
 * The documentation demonstrates architectural maturity
-
----
-
-## 12. Long-Term Vision
-
-This library becomes:
-
-* A trust layer for civic platforms
-* A research sandbox for AI detectability
-* A reference implementation for probabilistic AI detection
-* A foundation for policy-aware moderation systems
 
 ---

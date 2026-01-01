@@ -44,10 +44,13 @@ class TestTextSignals(unittest.TestCase):
         # Create mock modules
         mock_torch = MagicMock()
         mock_transformers = MagicMock()
+        mock_numpy = MagicMock()
 
         # Setup mock behavior
         mock_torch.cuda.is_available.return_value = False
         mock_torch.exp.return_value.item.return_value = 10.5 # Perplexity value
+        mock_numpy.mean.return_value = 10.5
+        mock_numpy.std.return_value = 0.0
 
         mock_tokenizer = MagicMock()
         mock_model = MagicMock()
@@ -63,20 +66,28 @@ class TestTextSignals(unittest.TestCase):
         mock_model.return_value = mock_outputs
 
         # Inject mocks into sys.modules
+        # We also need to mock numpy inside the module run
         with patch.dict(sys.modules, {'torch': mock_torch, 'transformers': mock_transformers}):
-            signal = PerplexitySignal()
+            with patch('numpy.mean', return_value=10.5) as mock_mean:
+                with patch('numpy.std', return_value=0.0) as mock_std:
+                    signal = PerplexitySignal()
 
-            # Now run signal.run("test")
-            # This will trigger:
-            # 1. _load_model() -> imports transformers/torch (which are our mocks)
-            # 2. uses tokenizer/model to calculate perplexity
+                    # Now run signal.run("test")
+                    # This will trigger:
+                    # 1. _load_model() -> imports transformers/torch (which are our mocks)
+                    # 2. uses tokenizer/model to calculate perplexity
 
-            result = signal.run("This is a test.")
+                    result = signal.run("This is a test.")
 
-            self.assertIsNone(result.error, msg=f"Signal run failed with error: {result.error}")
-            self.assertEqual(result.score, 0.5)
-            self.assertAlmostEqual(result.metadata["perplexity"], 10.5)
-            self.assertEqual(result.metadata["model_id"], "gpt2")
+                    self.assertIsNone(result.error, msg=f"Signal run failed with error: {result.error}")
+
+                    # Score is no longer hardcoded to 0.5.
+                    # With PPL=10.5, score should be roughly:
+                    # score = 1.0 / (1.0 + exp((10.5 - 50) / 10)) = 1 / (1 + exp(-3.95)) = 1 / (1 + 0.019) ~= 0.98
+                    self.assertGreater(result.score, 0.9)
+
+                    self.assertAlmostEqual(result.metadata["mean_perplexity"], 10.5)
+                    self.assertEqual(result.metadata["model_id"], "gpt2")
 
 if __name__ == '__main__':
     unittest.main()

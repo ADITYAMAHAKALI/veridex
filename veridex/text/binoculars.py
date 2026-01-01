@@ -1,0 +1,147 @@
+from typing import Any
+from veridex.core.signal import BaseSignal, DetectionResult
+
+class BinocularsSignal(BaseSignal):
+    """
+    Implements the Binoculars zero-shot detection method.
+    It compares the perplexity of a 'Observer' model vs a 'Performer' model.
+
+    Score = log(PPL_Observer) / log(PPL_Performer)
+
+    If the score is below a threshold, it is likely AI-generated.
+
+    Ref: "Spotting LLMs With Binoculars: Zero-Shot Detection of Machine-Generated Text"
+
+    Note: This implementation requires 'transformers' and 'torch'.
+    For testing purposes in constrained environments, this class supports mocking behavior.
+    """
+
+    def __init__(self, observer_id: str = "tiiuae/falcon-7b-instruct", performer_id: str = "tiiuae/falcon-7b", use_mock: bool = False):
+        self.observer_id = observer_id
+        self.performer_id = performer_id
+        self.use_mock = use_mock
+        self._observer_model = None
+        self._performer_model = None
+        self._tokenizer = None
+
+    @property
+    def name(self) -> str:
+        return "binoculars"
+
+    @property
+    def dtype(self) -> str:
+        return "text"
+
+    def check_dependencies(self) -> None:
+        if self.use_mock:
+            return
+
+        try:
+            import torch
+            import transformers
+        except ImportError:
+            raise ImportError(
+                "The 'text' extra dependencies (transformers, torch) are required for BinocularsSignal. "
+                "Install them with `pip install veridex[text]`."
+            )
+
+    def _load_models(self):
+        if self.use_mock:
+            return
+
+        if self._observer_model is not None and self._performer_model is not None:
+            return
+
+        self.check_dependencies()
+
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        import torch
+
+        device = "cpu"
+        if torch.cuda.is_available():
+            device = "cuda"
+        self._device = device
+
+        # Shared tokenizer usually works if models are from same family
+        self._tokenizer = AutoTokenizer.from_pretrained(self.observer_id)
+
+        self._observer_model = AutoModelForCausalLM.from_pretrained(
+            self.observer_id,
+            trust_remote_code=True,
+            torch_dtype=torch.float16 if device == "cuda" else torch.float32
+        ).to(device)
+
+        self._performer_model = AutoModelForCausalLM.from_pretrained(
+            self.performer_id,
+            trust_remote_code=True,
+            torch_dtype=torch.float16 if device == "cuda" else torch.float32
+        ).to(device)
+
+    def _calculate_ppl(self, model, text):
+        import torch
+        inputs = self._tokenizer(text, return_tensors="pt")
+        inputs = {k: v.to(self._device) for k, v in inputs.items()}
+        with torch.no_grad():
+            outputs = model(**inputs, labels=inputs["input_ids"])
+            return torch.exp(outputs.loss).item()
+
+    def run(self, input_data: Any) -> DetectionResult:
+        if not isinstance(input_data, str):
+            return DetectionResult(score=0.0, confidence=0.0, metadata={}, error="Input must be a string.")
+
+        if self.use_mock:
+            # Mock behavior for testing without heavy downloads
+            # Return a dummy result
+            return DetectionResult(
+                score=0.9,
+                confidence=1.0,
+                metadata={
+                    "binoculars_score": 0.85,
+                    "threshold": 0.90,
+                    "mode": "mock"
+                }
+            )
+
+        try:
+            self._load_models()
+            import numpy as np
+
+            ppl_observer = self._calculate_ppl(self._observer_model, input_data)
+            ppl_performer = self._calculate_ppl(self._performer_model, input_data)
+
+            # Binoculars Score = log(PPL_Observer) / log(PPL_Performer)
+            # Avoid division by zero
+            if ppl_performer <= 1.0:
+                ppl_performer = 1.0001
+
+            score_val = np.log(ppl_observer) / np.log(ppl_performer)
+
+            # Thresholding (from paper, typically around 0.9017 for Falcon)
+            # If score < threshold, it is AI.
+            threshold = 0.9017
+
+            # Convert to probability:
+            # If score is much lower than threshold -> High AI prob.
+            # If score is higher than threshold -> Low AI prob.
+
+            is_ai = score_val < threshold
+            ai_prob = 0.9 if is_ai else 0.1
+
+            return DetectionResult(
+                score=ai_prob,
+                confidence=0.8,
+                metadata={
+                    "binoculars_score": score_val,
+                    "ppl_observer": ppl_observer,
+                    "ppl_performer": ppl_performer,
+                    "threshold": threshold
+                }
+            )
+
+        except Exception as e:
+            return DetectionResult(
+                score=0.0,
+                confidence=0.0,
+                metadata={},
+                error=f"Binoculars failed: {str(e)}"
+            )
