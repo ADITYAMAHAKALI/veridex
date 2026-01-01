@@ -1,0 +1,1242 @@
+# ADR-0001: Signal-Based Probabilistic Architecture for AI Content Detection
+
+**Status:** Accepted
+**Date:** 2026-01-01
+**Decision Makers:** Aditya Mahakali
+**Technical Area:** Machine Learning Systems / Trust & Safety
+
+---
+
+## Context
+
+The rapid proliferation of generative AI systems has created a growing need for mechanisms to assess whether content is likely to be AI-generated. Existing detection approaches commonly suffer from the following limitations:
+
+* Binary classification outputs without uncertainty estimation
+* Overfitting to specific model families or datasets
+* Poor robustness under human post-editing
+* Lack of transparency around decision-making and failure modes
+* Monolithic architectures that are difficult to extend or evaluate
+
+Given these constraints, there is a need for an architecture that supports **probabilistic reasoning, interpretability, extensibility, and honest evaluation**, while remaining usable in real-world systems.
+
+---
+
+## Decision
+
+We will implement the AI Content Detection Library using a **signal-based probabilistic architecture** rather than a monolithic classifier.
+
+The system will:
+
+* Decompose detection into independent, interpretable signals
+* Combine signals via explicit fusion and calibration stages
+* Produce probabilistic outputs with confidence estimates
+* Surface known failure modes and applicability constraints
+
+This architecture will initially focus on **text-based detection**, with extensibility to images and video.
+
+---
+
+## Architectural Approach
+
+### High-Level Design
+
+```
+Input Content
+   ↓
+Independent Signal Extractors
+   ↓
+Signal Normalization
+   ↓
+Fusion & Calibration
+   ↓
+Probabilistic Detection Output
+```
+
+Each signal operates independently and contributes partial evidence toward AI-generation likelihood.
+
+---
+
+## Rationale
+
+### Why Signal-Based?
+
+* **Interpretability:** Individual signals (e.g., perplexity, stylometry) can be inspected and reasoned about.
+* **Failure Isolation:** Signals fail independently; failure in one does not invalidate the entire system.
+* **Research Flexibility:** New detection ideas can be added as new signals without refactoring core logic.
+* **Honest Modeling:** Supports probabilistic outputs rather than misleading binary decisions.
+
+### Why Not a Single Classifier?
+
+Monolithic classifiers:
+
+* Obscure failure modes
+* Encourage overconfidence
+* Are brittle to domain shift
+* Conflate detection logic with training data artifacts
+
+Given the adversarial and uncertain nature of AI detection, these trade-offs are unacceptable.
+
+---
+
+## Core Architectural Decisions
+
+### 1. Probabilistic Output Over Binary Classification
+
+The system will output:
+
+* Estimated probability of AI generation
+* Confidence/reliability estimate
+* Per-signal scores
+* Failure mode indicators
+
+This explicitly acknowledges uncertainty and reduces the risk of misuse.
+
+---
+
+### 2. Explicit Signal Interfaces
+
+Each detection signal must implement:
+
+* Applicability checks
+* Feature extraction
+* Scoring logic
+* Declared failure modes
+
+This enforces consistency, testability, and transparency.
+
+---
+
+### 3. Fusion and Calibration as Separate Stages
+
+Signal aggregation and confidence calibration are distinct concerns:
+
+* Fusion combines evidence
+* Calibration estimates reliability
+
+This separation enables:
+
+* Experimentation with different fusion strategies
+* Independent evaluation of calibration quality
+
+---
+
+### 4. Failure Modes as First-Class Outputs
+
+The system will explicitly surface:
+
+* Known signal weaknesses
+* Input conditions that reduce reliability
+* Adversarial vulnerability indicators
+
+Failure modes are considered **informational outputs**, not internal errors.
+
+---
+
+### 5. Modality Isolation
+
+Text, image, and video detection pipelines are isolated by design.
+
+This prevents:
+
+* Cross-modality coupling
+* Accidental assumptions about shared signal properties
+* Architectural rigidity
+
+---
+
+## Consequences
+
+### Positive Consequences
+
+* High interpretability and debuggability
+* Strong research alignment
+* Extensible and maintainable architecture
+* Reduced risk of overconfident misuse
+* Suitable for real-world trust and safety systems
+
+---
+
+### Negative Consequences
+
+* More engineering complexity than a single classifier
+* Potentially lower raw accuracy on benchmark datasets
+* Requires careful calibration and evaluation
+* Harder to communicate to non-technical stakeholders
+
+These trade-offs are accepted in favor of robustness and honesty.
+
+---
+
+## Alternatives Considered
+
+### 1. End-to-End Neural Classifier
+
+**Rejected** due to:
+
+* Lack of transparency
+* High brittleness
+* Overconfidence under distribution shift
+
+---
+
+### 2. Watermark-Based Detection
+
+**Rejected** as a primary strategy due to:
+
+* Dependence on generator cooperation
+* Fragility under paraphrasing and editing
+* Limited applicability to existing content
+
+---
+
+### 3. Rule-Based Heuristics Only
+
+**Rejected** due to:
+
+* Poor generalization
+* Inability to express uncertainty
+* Limited extensibility
+
+---
+
+## Implementation Notes
+
+* Initial fusion strategy will be heuristic-based.
+* Learned fusion models may be explored experimentally.
+* Calibration will use held-out, domain-diverse datasets.
+* Evaluation will prioritize false-positive control.
+
+---
+
+## Risks & Mitigations
+
+| Risk                      | Mitigation                         |
+| ------------------------- | ---------------------------------- |
+| Overconfidence in outputs | Probabilistic scoring + confidence |
+| Adversarial evasion       | Failure mode disclosure            |
+| Dataset bias              | Domain-diverse evaluation          |
+| Misuse in moderation      | Explicit documentation of limits   |
+
+---
+
+## Status & Next Steps
+
+**Status:** Accepted
+**Next Steps:**
+
+1. Define signal interface contracts
+2. Implement core fusion & calibration modules
+3. Build text-based signal implementations
+4. Establish evaluation benchmarks
+5. Publish documentation on limitations
+
+---
+
+## References
+
+* Perplexity-based detection literature
+* Stylometric analysis research
+* Adversarial ML robustness studies
+* Calibration techniques for probabilistic classifiers
+
+---
+Perfect. This ADR is *where you really separate yourself* from “ML implementers” and step into **architect / research-engineer** territory.
+
+Below is **ADR-0002**, written to be consistent with ADR-0001 and defensible in reviews, interviews, or public OSS scrutiny.
+
+You can save this as:
+`docs/adr/0002-fusion-strategy-choice.md`
+
+---
+
+# ADR-0002: Choice of Fusion Strategy for Multi-Signal AI Content Detection
+
+**Status:** Accepted
+**Date:** 2026-01-01
+**Decision Makers:** Aditya Mahakali
+**Technical Area:** ML Systems / Probabilistic Inference
+
+---
+
+## Context
+
+The AI Content Detection Library (ADR-0001) adopts a **signal-based architecture**, where multiple independent signals provide partial evidence about whether content is AI-generated.
+
+Given this design, the system requires a **fusion strategy** to:
+
+* Combine heterogeneous signal scores
+* Handle missing or unreliable signals
+* Produce a probabilistic output
+* Support calibration and interpretability
+
+Fusion is a critical architectural decision because:
+
+* Signals differ in scale, reliability, and applicability
+* Ground truth is noisy and adversarial
+* Overconfident aggregation increases false-positive risk
+* The system must remain extensible and debuggable
+
+---
+
+## Decision
+
+The system will use a **layered fusion strategy**, consisting of:
+
+1. **Deterministic, interpretable fusion as the default**
+2. **Optional learned fusion as an experimental extension**
+3. **Explicit separation between fusion and calibration**
+
+The initial production-ready fusion approach will be **weighted aggregation with reliability gating**, not an end-to-end learned model.
+
+---
+
+## Fusion Architecture Overview
+
+```
+Signal Scores
+   ↓
+Applicability & Reliability Gating
+   ↓
+Weighted Aggregation
+   ↓
+Raw AI-Generation Score
+   ↓
+Calibration Layer
+   ↓
+Final Probability + Confidence
+```
+
+---
+
+## Rationale
+
+### Why Not Pure Learned Fusion?
+
+End-to-end learned fusion (e.g., neural networks over signals):
+
+* Obscures decision logic
+* Entangles dataset bias with fusion behavior
+* Fails silently under domain shift
+* Makes failure analysis difficult
+
+Given the **high cost of false positives** and the **inherent uncertainty** of AI detection, opaque fusion is not acceptable as the default.
+
+---
+
+### Why Deterministic Fusion First?
+
+Deterministic fusion provides:
+
+* Interpretability (clear contribution per signal)
+* Predictable behavior under missing signals
+* Easier debugging and stress testing
+* Better alignment with trust & safety use cases
+
+This aligns with the library’s philosophy of **honest uncertainty modeling**.
+
+---
+
+## Core Fusion Design Decisions
+
+### 1. Signal Normalization
+
+All signals must be normalized into a common range (e.g., [0, 1]) representing *evidence strength* toward AI generation.
+
+Normalization strategies may include:
+
+* Min-max normalization
+* Z-score with clipping
+* Empirical CDF mapping
+
+Normalization is signal-specific and versioned.
+
+---
+
+### 2. Applicability Gating
+
+Before fusion, each signal must declare whether it is **applicable** to the input.
+
+Examples:
+
+* Stylometry signals are unreliable for very short text
+* Perplexity signals degrade for non-natural language
+* Compression signals fail on highly structured inputs
+
+Non-applicable signals:
+
+* Do not contribute to the fused score
+* Are recorded in the output metadata
+
+---
+
+### 3. Reliability Weighting
+
+Each applicable signal contributes with a **weight proportional to its estimated reliability**.
+
+Reliability may depend on:
+
+* Input length
+* Domain match
+* Historical calibration performance
+* Signal-specific heuristics
+
+Weights are:
+
+* Explicit
+* Adjustable
+* Documented
+
+This prevents weak signals from dominating the output.
+
+---
+
+### 4. Weighted Aggregation Strategy
+
+The default aggregation strategy is a **weighted mean**:
+
+```
+raw_score = Σ (w_i * s_i) / Σ w_i
+```
+
+Where:
+
+* `s_i` is the normalized signal score
+* `w_i` is the reliability-adjusted weight
+
+This strategy:
+
+* Is stable
+* Is interpretable
+* Handles missing signals gracefully
+
+---
+
+### 5. Fusion Is Not Calibration
+
+Fusion produces a **raw evidence score**, not a final probability.
+
+Calibration is handled as a **separate stage** to:
+
+* Adjust for dataset bias
+* Estimate uncertainty
+* Control false-positive rates
+
+This separation ensures clean architectural boundaries.
+
+---
+
+## Calibration Strategy (Boundary Definition)
+
+While calibration details are addressed in a separate ADR, fusion MUST:
+
+* Output raw, uncalibrated scores
+* Preserve per-signal contributions
+* Avoid thresholding or hard decisions
+
+Calibration may use:
+
+* Platt scaling
+* Isotonic regression
+* Bayesian uncertainty estimation
+
+---
+
+## Alternatives Considered
+
+### 1. End-to-End Neural Fusion Model
+
+**Rejected** as default due to:
+
+* Poor interpretability
+* Fragility under distribution shift
+* Difficulty in diagnosing failures
+
+---
+
+### 2. Rule-Based Hard Thresholding
+
+**Rejected** due to:
+
+* Binary behavior
+* Inability to express uncertainty
+* Poor extensibility
+
+---
+
+### 3. Bayesian Graphical Model (Full Probabilistic Inference)
+
+**Deferred**, not rejected.
+
+Pros:
+
+* Principled uncertainty modeling
+* Theoretically sound
+
+Cons:
+
+* High implementation complexity
+* Requires strong prior assumptions
+
+May be explored as a **research extension**, not the baseline.
+
+---
+
+## Consequences
+
+### Positive Consequences
+
+* Transparent decision-making
+* Stable behavior under partial signal failure
+* Easy experimentation with new signals
+* Strong alignment with trust-sensitive domains
+
+---
+
+### Negative Consequences
+
+* Potentially lower peak benchmark performance
+* Requires manual weight tuning
+* More engineering effort than a single classifier
+
+These trade-offs are accepted in favor of robustness and honesty.
+
+---
+
+## Risks & Mitigations
+
+| Risk                        | Mitigation                          |
+| --------------------------- | ----------------------------------- |
+| Over-reliance on heuristics | Continuous evaluation & ADR updates |
+| Weight misconfiguration     | Versioned configs & benchmarking    |
+| Signal correlation          | Monitoring contribution dominance   |
+| Dataset bias leakage        | Separate calibration layer          |
+
+---
+
+## Status & Review Plan
+
+**Status:** Accepted
+
+This ADR will be revisited if:
+
+* Learned fusion demonstrably improves robustness without harming interpretability
+* Bayesian methods become tractable with sufficient data
+* New modalities introduce fundamentally different signal dynamics
+
+---
+
+## Summary
+
+This decision prioritizes:
+
+* Interpretability over raw accuracy
+* Robustness over cleverness
+* Explicit uncertainty over false certainty
+
+The fusion strategy is intentionally conservative, reflecting the adversarial and probabilistic nature of AI content detection.
+
+---
+Excellent. This is the ADR that *proves* you understand uncertainty better than most production ML systems.
+
+Below is **ADR-0003**, written to slot cleanly after ADR-0001 and ADR-0002.
+Save as:
+`docs/adr/0003-calibration-and-confidence-estimation.md`
+
+---
+
+# ADR-0003: Calibration and Confidence Estimation Strategy
+
+**Status:** Accepted
+**Date:** 2026-01-01
+**Decision Makers:** Aditya Mahakali
+**Technical Area:** ML Reliability / Uncertainty Estimation
+
+---
+
+## Context
+
+Following ADR-0001 (signal-based architecture) and ADR-0002 (fusion strategy), the system produces a **raw fused score** representing aggregated evidence of AI-generated content.
+
+However:
+
+* Raw scores are **not probabilities**
+* Detection operates under dataset bias, domain shift, and adversarial noise
+* False positives carry higher cost than false negatives
+* Users require a measure of **how much to trust the output**
+
+Therefore, the system requires a **calibration and confidence estimation strategy** that:
+
+* Converts raw scores into meaningful probabilities
+* Estimates output reliability
+* Explicitly models uncertainty and failure conditions
+
+---
+
+## Decision
+
+The system will implement a **two-layer post-fusion reliability model**:
+
+1. **Score Calibration Layer**
+   Converts raw fusion scores into calibrated probabilities.
+
+2. **Confidence Estimation Layer**
+   Estimates how reliable the calibrated probability is for a given input.
+
+These two concerns are explicitly separated and independently evaluated.
+
+---
+
+## High-Level Architecture
+
+```
+Raw Fused Score
+   ↓
+Calibration Layer
+   ↓
+Calibrated Probability
+   ↓
+Confidence Estimation
+   ↓
+Final Output:
+  - Probability
+  - Confidence
+  - Warnings / Failure Flags
+```
+
+---
+
+## Rationale
+
+### Why Calibration Is Necessary
+
+Raw detection scores:
+
+* Are not comparable across datasets
+* Drift under domain shift
+* Encourage overconfidence if treated as probabilities
+
+Calibration ensures:
+
+* Probability outputs reflect empirical likelihoods
+* Thresholds behave consistently
+* Evaluation metrics are meaningful
+
+---
+
+### Why Confidence ≠ Probability
+
+A calibrated probability answers:
+
+> “Given similar data, how often was this score correct?”
+
+Confidence answers:
+
+> “How much should we trust this estimate for *this input*?”
+
+Conflating these leads to dangerous misuse.
+
+---
+
+## Core Design Decisions
+
+---
+
+### 1. Calibration as a Dedicated Layer
+
+Calibration is applied **after fusion** and operates only on:
+
+* Raw fused score
+* Validation data
+
+Calibration methods may include:
+
+* Platt scaling
+* Isotonic regression
+* Temperature scaling (if learned fusion is used)
+
+Calibration models are:
+
+* Versioned
+* Dataset-specific
+* Periodically re-evaluated
+
+---
+
+### 2. Domain-Aware Calibration
+
+Calibration must account for:
+
+* Text length
+* Content domain (e.g., news, social, code)
+* Language
+
+The system supports:
+
+* Multiple calibration profiles
+* Automatic profile selection when possible
+* Fallback to conservative calibration under uncertainty
+
+---
+
+### 3. Confidence Estimation Inputs
+
+Confidence estimation considers **meta-signals**, not content signals.
+
+Examples:
+
+* Number of applicable signals
+* Signal agreement / disagreement
+* Signal reliability weights
+* Known failure mode triggers
+* Distance from calibration data distribution
+
+This ensures confidence reflects **system certainty**, not raw evidence strength.
+
+---
+
+### 4. Confidence Computation Strategy
+
+The default confidence score is derived from a weighted combination of:
+
+* **Signal Coverage:**
+  Fraction of applicable vs expected signals
+
+* **Signal Agreement:**
+  Variance among contributing signal scores
+
+* **Calibration Trust:**
+  Empirical calibration error in similar regions
+
+* **Failure Mode Penalties:**
+  Known degradation conditions reduce confidence
+
+Confidence is bounded in `[0, 1]` and intentionally conservative.
+
+---
+
+### 5. Conservative Behavior Under Uncertainty
+
+When:
+
+* Calibration profile is missing
+* Input is out-of-distribution
+* Multiple failure modes are triggered
+
+The system MUST:
+
+* Lower confidence
+* Emit warnings
+* Avoid extreme probability outputs
+
+This prevents misleading certainty.
+
+---
+
+## Output Contract
+
+Final outputs MUST include:
+
+```json
+{
+  "ai_generated_probability": float,
+  "confidence": float,
+  "calibration_profile": string,
+  "warnings": [string],
+  "failure_modes": [string]
+}
+```
+
+Probability and confidence are explicitly separate fields.
+
+---
+
+## Alternatives Considered
+
+### 1. No Calibration (Raw Scores as Probabilities)
+
+**Rejected** due to:
+
+* Misleading outputs
+* Poor threshold stability
+* High false-positive risk
+
+---
+
+### 2. Bayesian End-to-End Uncertainty Modeling
+
+**Deferred**, not rejected.
+
+Pros:
+
+* Principled uncertainty modeling
+
+Cons:
+
+* Strong assumptions
+* High implementation complexity
+* Limited interpretability
+
+May be explored in research extensions.
+
+---
+
+### 3. Confidence as Model Softmax Entropy
+
+**Rejected** due to:
+
+* Overconfidence under distribution shift
+* Entanglement with classifier internals
+* Poor interpretability
+
+---
+
+## Consequences
+
+### Positive Consequences
+
+* Safer system behavior
+* Honest uncertainty communication
+* Better trust alignment
+* More meaningful evaluation
+
+---
+
+### Negative Consequences
+
+* Increased system complexity
+* Requires additional validation data
+* More moving parts to maintain
+
+These are accepted trade-offs for reliability.
+
+---
+
+## Risks & Mitigations
+
+| Risk                     | Mitigation                        |
+| ------------------------ | --------------------------------- |
+| Calibration drift        | Periodic re-calibration           |
+| Overconfidence           | Conservative confidence penalties |
+| Domain misclassification | Fallback calibration              |
+| User misuse              | Clear documentation & warnings    |
+
+---
+
+## Status & Review Plan
+
+**Status:** Accepted
+
+This ADR will be revisited if:
+
+* New modalities require different calibration logic
+* Bayesian uncertainty becomes tractable
+* Learned fusion becomes the default
+
+---
+
+## Summary
+
+This decision enforces a strict separation between:
+
+* **Evidence aggregation (fusion)**
+* **Probability estimation (calibration)**
+* **Reliability estimation (confidence)**
+
+This separation is essential for building trustworthy AI detection systems under uncertainty.
+
+---
+
+### Architect’s note (keep this principle)
+
+> **Probability answers “how likely.”
+> Confidence answers “how sure.”**
+
+Mixing them is the fastest way to lose trust.
+
+---
+Absolutely. Below are **three complete, formal ADRs**, written in the same architectural voice as ADR-0001 to ADR-0003, with **you explicitly credited as the author**.
+
+You can drop these directly into `docs/adr/`.
+
+---
+
+# ADR-0004: Evaluation Strategy & Benchmark Governance
+
+**Status:** Accepted
+**Date:** 2026-01-01
+**Author:** **Aditya Mahakali**
+**Decision Makers:** Project Author
+**Technical Area:** ML Evaluation / Benchmarking / Trust & Safety
+
+---
+
+## Context
+
+AI content detection systems are highly sensitive to:
+
+* Dataset composition
+* Domain and language shift
+* Human post-editing
+* Adversarial behavior
+
+Traditional evaluation practices (single benchmark, accuracy-centric metrics) are insufficient and often misleading in this domain.
+
+Given that VERIDEX produces **probabilistic, uncertainty-aware outputs**, its evaluation strategy must:
+
+* Reflect real-world usage
+* Penalize overconfidence
+* Surface limitations honestly
+* Prevent benchmark overfitting
+
+---
+
+## Decision
+
+VERIDEX will adopt a **multi-axis evaluation strategy** governed by explicit benchmark policies rather than a single canonical dataset.
+
+Evaluation will be:
+
+* Dataset-diverse
+* Metric-rich
+* Failure-aware
+* Governance-driven
+
+No single metric or benchmark will be treated as definitive.
+
+---
+
+## Evaluation Axes
+
+### 1. Content Origin Axis
+
+Datasets must include:
+
+* Human-only content
+* AI-only content
+* AI-generated + human-edited content
+
+This axis is mandatory to prevent inflated performance claims.
+
+---
+
+### 2. Domain Axis
+
+Evaluation datasets must span:
+
+* News / blogs
+* Social media
+* Formal writing
+* Informal / conversational text
+* Technical or structured text
+
+Domain performance must be reported separately.
+
+---
+
+### 3. Length & Structure Axis
+
+Detection performance must be evaluated across:
+
+* Short text (<100 tokens)
+* Medium text
+* Long-form text
+
+This ensures honest reporting of stylometry and perplexity degradation.
+
+---
+
+## Metrics (Required)
+
+Accuracy is explicitly **not sufficient**.
+
+Required metrics include:
+
+* AUROC
+* Precision–Recall curves
+* Expected Calibration Error (ECE)
+* False Positive Rate at fixed recall
+* Confidence–Error correlation
+
+False positives are treated as higher cost than false negatives.
+
+---
+
+## Stress & Adversarial Testing
+
+The evaluation framework must include:
+
+* Paraphrased AI content
+* Partial human rewrites
+* Prompt-engineered evasion attempts
+* Domain-shifted evaluation
+
+Stress test results must be published alongside headline metrics.
+
+---
+
+## Benchmark Governance Rules
+
+1. All benchmarks must be documented with provenance.
+2. No private benchmark may be used to make public claims.
+3. Improvements on one benchmark must be checked for regressions elsewhere.
+4. Evaluation scripts must be reproducible.
+5. Benchmark cherry-picking is explicitly discouraged.
+
+---
+
+## Consequences
+
+### Positive
+
+* Prevents misleading performance claims
+* Aligns with trust & safety requirements
+* Encourages robust system design
+
+### Negative
+
+* Slower iteration
+* Lower headline numbers
+* Higher engineering overhead
+
+These trade-offs are accepted.
+
+---
+
+## Summary
+
+Evaluation in VERIDEX is treated as a **first-class system**, not an afterthought.
+Benchmark governance is essential to maintain credibility and trust.
+
+---
+
+---
+
+# ADR-0005: Failure Mode Taxonomy
+
+**Status:** Accepted
+**Date:** 2026-01-01
+**Author:** **Aditya Mahakali**
+**Decision Makers:** Project Author
+**Technical Area:** Reliability Engineering / ML Safety
+
+---
+
+## Context
+
+AI content detection systems are inherently imperfect. Failure is not an exception but an expected condition under:
+
+* Human intervention
+* Adversarial manipulation
+* Domain mismatch
+* Limited signal coverage
+
+Most systems hide or ignore these failures, leading to overconfidence and misuse.
+
+---
+
+## Decision
+
+VERIDEX will define and maintain an explicit **Failure Mode Taxonomy**, and surface applicable failure modes as part of its standard output.
+
+Failures are treated as **informational signals**, not internal errors.
+
+---
+
+## Failure Mode Categories
+
+### 1. Input-Based Failures
+
+* Text too short
+* Non-natural language input
+* Mixed languages
+* Highly structured content
+
+---
+
+### 2. Signal-Level Failures
+
+* Stylometry invalidated by editing
+* Perplexity unreliable due to domain mismatch
+* Compression signals saturated
+
+---
+
+### 3. Systemic Failures
+
+* Insufficient signal coverage
+* Strong disagreement among signals
+* Calibration profile unavailable
+
+---
+
+### 4. Adversarial Failures
+
+* Intentional paraphrasing
+* Prompt-based evasion
+* Multi-model blending
+
+---
+
+## Failure Mode Representation
+
+Failure modes must be:
+
+* Named
+* Documented
+* Machine-readable
+* Human-interpretable
+
+Example:
+
+```json
+{
+  "failure_modes": [
+    "SHORT_TEXT",
+    "HUMAN_POST_EDITING_POSSIBLE"
+  ]
+}
+```
+
+---
+
+## Design Principles
+
+* Failure modes lower confidence, not probability directly
+* Multiple failure modes compound uncertainty
+* Unknown failures default to conservative behavior
+
+---
+
+## Consequences
+
+### Positive
+
+* Safer downstream usage
+* Transparent system behavior
+* Better debugging and research insight
+
+### Negative
+
+* More verbose outputs
+* Harder to market simplistically
+
+Accepted as necessary.
+
+---
+
+## Summary
+
+Explicit failure modeling is a **core feature**, not a weakness.
+The taxonomy ensures VERIDEX communicates uncertainty honestly.
+
+---
+
+---
+
+# ADR-0006: Modality Expansion (Text → Image → Video)
+
+**Status:** Accepted
+**Date:** 2026-01-01
+**Author:** **Aditya Mahakali**
+**Decision Makers:** Project Author
+**Technical Area:** Multimodal ML Systems
+
+---
+
+## Context
+
+While VERIDEX initially targets text-based AI detection, real-world systems increasingly require detection across:
+
+* Images
+* Video
+* Mixed-modal content
+
+However, modalities differ significantly in:
+
+* Signal reliability
+* Adversarial robustness
+* Computational cost
+
+A naïve unified architecture risks conflating these differences.
+
+---
+
+## Decision
+
+VERIDEX will adopt a **modality-isolated expansion strategy**, where each modality has:
+
+* Independent signal pipelines
+* Modality-specific calibration
+* Separate evaluation benchmarks
+
+Cross-modal fusion is explicitly out of scope for initial versions.
+
+---
+
+## Modality Roadmap
+
+### Phase 1 — Text (Baseline)
+
+* Perplexity
+* Stylometry
+* Compression
+* Strong calibration & evaluation
+
+---
+
+### Phase 2 — Image
+
+* Frequency-domain artifacts
+* Diffusion noise residuals
+* Patch-level inconsistency detection
+
+Image detection is explicitly labeled as **lower confidence**.
+
+---
+
+### Phase 3 — Video (Research-Only)
+
+* Frame-level aggregation
+* Temporal consistency checks
+* Metadata-based heuristics
+
+Video detection will not provide strong guarantees.
+
+---
+
+## Architectural Implications
+
+* Each modality has its own:
+
+  * Signal registry
+  * Fusion strategy
+  * Calibration profiles
+* Shared core abstractions are minimal
+* Modality-specific limitations are documented
+
+---
+
+## Consequences
+
+### Positive
+
+* Prevents overgeneralization
+* Enables modality-appropriate rigor
+* Simplifies debugging and evaluation
+
+### Negative
+
+* Slower multi-modal feature parity
+* More code duplication
+
+Accepted as a safety-first trade-off.
+
+---
+
+## Summary
+
+Modality expansion in VERIDEX prioritizes **correctness over completeness**.
+Each modality is treated as a distinct detection problem, not a variant of the same one.
+
+---
+
