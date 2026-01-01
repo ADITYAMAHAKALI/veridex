@@ -4,9 +4,20 @@ from veridex.core.signal import BaseSignal, DetectionResult
 
 class FrequencySignal(BaseSignal):
     """
-    Analyzes frequency domain artifacts in images using FFT.
-    AI-generated images often exhibit spectral anomalies, such as high-frequency
-    peaks or irregular power distribution.
+    Detects AI images using frequency domain analysis (FFT).
+
+    AI-generated images often exhibit specific artifacts in the frequency domain,
+    such as regular grid-like patterns (checkerboard artifacts) from upsampling layers
+    or anomalous power distributions compared to natural images.
+
+    This signal computes the Fourier Transform of the image and extracts features like:
+    - Mean frequency magnitude
+    - High-frequency energy ratio
+    - Variance of the Laplacian (sharpness/texture)
+
+    Attributes:
+        name (str): 'frequency_artifacts'
+        dtype (str): 'image'
     """
 
     @property

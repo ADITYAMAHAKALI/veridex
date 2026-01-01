@@ -31,6 +31,13 @@ image = [
     "Pillow>=9.0.0",
     "opencv-python-headless>=4.0.0"
 ]
+audio = [
+    "torch>=2.0.0",
+    "torchaudio>=2.0.0",
+    "transformers>=4.30.0",
+    "librosa>=0.10.0",
+    "soundfile>=0.12.0"
+]
 dev = [
     "pytest>=7.0.0",
     "black>=23.0.0",

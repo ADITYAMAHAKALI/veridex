@@ -4,17 +4,37 @@ from veridex.core.signal import BaseSignal, DetectionResult
 
 class DIRESignal(BaseSignal):
     """
-    Diffusion Reconstruction Error (DIRE) Signal.
+    Detects AI images using Diffusion Reconstruction Error (DIRE).
 
-    Based on the paper: "DIRE for Diffusion-Generated Image Detection" (2023).
-    Hypothesis: Diffusion-generated images can be reconstructed more accurately
-    by a pre-trained diffusion model than real images.
+    Based on the hypothesis that diffusion models can reconstruct images they generated
+    (or similar ones) more accurately than real natural images.
 
-    Score: High score (near 1.0) means Low Reconstruction Error -> Likely AI.
-           Low score (near 0.0) means High Reconstruction Error -> Likely Real.
+    Methodology:
+        1. Take input image I.
+        2. Add noise to obtain I_noisy (simulating diffusion forward step).
+        3. Denoise I_noisy using a pre-trained diffusion model to get I_rec.
+        4. Calculate Reconstruction Error = |I - I_rec|.
+        - Low Error -> Likely AI (on the model's manifold).
+        - High Error -> Likely Real (harder to reconstruct).
+
+    Note:
+        This is a simplified approximation using Image-to-Image translation with low strength
+        as a proxy for the full DDIM inversion process described in the original paper.
+
+    Attributes:
+        name (str): 'dire_reconstruction'
+        dtype (str): 'image'
+        model_id (str): HuggingFace Diffusion model ID.
     """
 
     def __init__(self, model_id: str = "runwayml/stable-diffusion-v1-5", device: str = "cpu"):
+        """
+        Initialize the DIRE signal.
+
+        Args:
+            model_id (str): The Stable Diffusion model to use for reconstruction.
+            device (str): Computation device ('cpu' or 'cuda').
+        """
         self.model_id = model_id
         self.device = device
         self._pipeline = None

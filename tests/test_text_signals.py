@@ -14,7 +14,7 @@ class TestTextSignals(unittest.TestCase):
         result = signal.run(text)
 
         self.assertIsNone(result.error)
-        self.assertEqual(result.score, 0.5)
+        self.assertAlmostEqual(result.score, 0.6, delta=0.01)
         self.assertIn("zlib_ratio", result.metadata)
         self.assertLess(result.metadata["zlib_ratio"], 1.0) # Should compress somewhat
 

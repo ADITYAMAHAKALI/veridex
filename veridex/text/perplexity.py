@@ -4,17 +4,34 @@ from veridex.core.signal import BaseSignal, DetectionResult
 
 class PerplexitySignal(BaseSignal):
     """
-    Calculates the perplexity and burstiness of the text using a pre-trained language model (e.g. GPT-2).
+    Detects AI content using Perplexity and Burstiness metrics.
 
-    Perplexity measures the 'surprise' of the text.
-    Burstiness measures the variation of perplexity across sentences.
+    This signal uses a pre-trained causal language model (default: GPT-2) to calculate
+    the perplexity (surprise) of the text.
 
-    Low Perplexity + Low Burstiness => Higher probability of being AI-generated.
+    Metrics:
+        - Perplexity: Exponential of the average negative log-likelihood per token.
+          Lower perplexity indicates the text is more predictable to the model (likely AI).
+        - Burstiness: The standard deviation of perplexity across sentences.
+          AI text tends to have consistent perplexity (low burstiness), while human writing varies.
 
-    Requires 'transformers', 'torch', and 'nltk' (optional, for sentence splitting) to be installed.
+    Dependencies:
+        Requires `transformers`, `torch`, and optionally `nltk` for sentence splitting.
+
+    Attributes:
+        name (str): 'perplexity_burstiness'
+        dtype (str): 'text'
+        model_id (str): HuggingFace model identifier.
     """
 
     def __init__(self, model_id: str = "gpt2"):
+        """
+        Initialize the Perplexity signal.
+
+        Args:
+            model_id (str): The HuggingFace model ID to use for calculation.
+                            Defaults to 'gpt2' (fast, reasonable baseline).
+        """
         self.model_id = model_id
         self._model = None
         self._tokenizer = None

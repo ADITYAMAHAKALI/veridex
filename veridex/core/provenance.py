@@ -3,8 +3,17 @@ from veridex.core.signal import BaseSignal, DetectionResult
 
 class C2PASignal(BaseSignal):
     """
-    Checks for C2PA manifests in the given file.
-    Requires 'c2pa-python' to be installed.
+    Detects Content Credentials (C2PA) manifests in files.
+
+    This signal checks if a file contains a C2PA manifest and parses it to determine
+    if the content is cryptographically signed as AI-generated or modified.
+
+    Attributes:
+        name (str): 'c2pa_provenance'
+        dtype (str): 'file'
+
+    Raises:
+        ImportError: If `c2pa-python` is not installed.
     """
 
     def __init__(self):

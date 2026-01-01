@@ -3,20 +3,35 @@ from veridex.core.signal import BaseSignal, DetectionResult
 
 class BinocularsSignal(BaseSignal):
     """
-    Implements the Binoculars zero-shot detection method.
-    It compares the perplexity of a 'Observer' model vs a 'Performer' model.
+    Implements the 'Binoculars' Zero-Shot Detection method.
 
-    Score = log(PPL_Observer) / log(PPL_Performer)
+    This advanced detection strategy compares the perplexity of two models forms a ratio:
+    an 'Observer' model and a 'Performer' model.
 
-    If the score is below a threshold, it is likely AI-generated.
+    Formula:
+        Score = log(PPL_Observer) / log(PPL_Performer)
 
-    Ref: "Spotting LLMs With Binoculars: Zero-Shot Detection of Machine-Generated Text"
+    Interpretation:
+        If the score is below a certain threshold (typically ~0.90), the text is considered
+        AI-generated. This method is considered state-of-the-art for zero-shot detection.
 
-    Note: This implementation requires 'transformers' and 'torch'.
-    For testing purposes in constrained environments, this class supports mocking behavior.
+    References:
+        "Spotting LLMs With Binoculars: Zero-Shot Detection of Machine-Generated Text" (arXiv:2401.12070)
+
+    Attributes:
+        name (str): 'binoculars'
+        dtype (str): 'text'
     """
 
     def __init__(self, observer_id: str = "tiiuae/falcon-7b-instruct", performer_id: str = "tiiuae/falcon-7b", use_mock: bool = False):
+        """
+        Initialize the Binoculars signal.
+
+        Args:
+            observer_id (str): HuggingFace ID for the observer model.
+            performer_id (str): HuggingFace ID for the performer model.
+            use_mock (bool): If True, returns dummy results without loading models (for testing).
+        """
         self.observer_id = observer_id
         self.performer_id = performer_id
         self.use_mock = use_mock
