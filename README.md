@@ -3,7 +3,7 @@
 **A modular, probabilistic, and research-grounded AI content detection library.**
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ADITYAMAHAKALI/veridex/blob/main/LICENSE)
 
 Veridex is a production-ready library for detecting AI-generated content across multiple modalities: **text**, **image**, and **audio**. Unlike binary classifiers, Veridex provides probabilistic detection with confidence estimates and interpretable signals.
 
@@ -122,15 +122,15 @@ pytest tests/audio/ -v
 pytest tests/ --cov=veridex --cov-report=html
 ```
 
-See [TESTING.md](TESTING.md) for detailed testing guide.
+See [TESTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md) for detailed testing guide.
 
 ## 📚 Documentation
 
-- **[Core Idea & Plan](core_idea_and_plan.md)** - Design philosophy and architecture
-- **[Research Document](AI-Generated%20Content%20Detection%20Research.md)** - Comprehensive technical analysis
-- **[Testing Guide](TESTING.md)** - How to test all metrics
+- **[Core Idea & Plan](https://github.com/ADITYAMAHAKALI/veridex/blob/main/core_idea_and_plan.md)** - Design philosophy and architecture
+- **[Research Document](https://github.com/ADITYAMAHAKALI/veridex/blob/main/AI-Generated%20Content%20Detection%20Research.md)** - Comprehensive technical analysis
+- **[Testing Guide](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md)** - How to test all metrics
 - **Module READMEs**:
-  - [Audio Detection](veridex/audio/README.md)
+  - [Audio Detection](https://github.com/ADITYAMAHAKALI/veridex/blob/main/veridex/audio/README.md)
   - Examples in `examples/` directory
 
 ## 🏗️ Architecture
@@ -151,13 +151,13 @@ Each detector:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/CONTRIBUTING.md) for guidelines.
 
 ### Development Setup
 
 ```bash
 # Clone repository
-git clone https://github.com/example/veridex.git
+git clone https://github.com/ADITYAMAHAKALI/veridex.git
 cd veridex
 
 # Create virtual environment
@@ -177,7 +177,7 @@ flake8 veridex/
 
 ## 📄 License
 
-Apache License 2.0 - See [LICENSE](LICENSE) for details.
+Apache License 2.0 - See [LICENSE](https://github.com/ADITYAMAHAKALI/veridex/blob/main/LICENSE) for details.
 
 ## 🔬 Research & Citations
 
@@ -188,7 +188,7 @@ Veridex is based on cutting-edge research in AI-generated content detection. Key
 - **DIRE**: Diffusion Reconstruction Error for deepfake images
 - **Wav2Vec 2.0**: Self-supervised foundation models for audio
 
-See [AI-Generated Content Detection Research.md](AI-Generated%20Content%20Detection%20Research.md) for full references.
+See [AI-Generated Content Detection Research.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/AI-Generated%20Content%20Detection%20Research.md) for full references.
 
 ## ⚠️ Limitations
 
@@ -216,7 +216,7 @@ Veridex is a **probabilistic detection tool**, not a definitive proof system:
 
 For questions, issues, or contributions:
 - Open an issue on GitHub
-- See [CONTRIBUTING.md](CONTRIBUTING.md)
+- See [CONTRIBUTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/CONTRIBUTING.md)
 
 ---
 
