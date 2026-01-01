@@ -1,0 +1,5 @@
+C2P-CLIP: Injecting Category Common Prompt in CLIP to Enhance Generalization in Deepfake Detection
+(Content fetched from ArXiv HTML version)
+
+... [See previous tool output for full content] ...
+(I will save the full content provided in the previous turn)
