@@ -1,6 +1,7 @@
 # Veridex Documentation
 
-<div class="hero">
+<div align="center">
+  <img src="images/logo.png" alt="Veridex Logo" width="250"/>
   <h1>🔍 Veridex</h1>
   <p><strong>A modular, probabilistic, and research-grounded AI content detection library</strong></p>
 </div>

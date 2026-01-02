@@ -1,5 +1,9 @@
 # Veridex
 
+<div align="center">
+  <img src="docs/images/logo.png" alt="Veridex Logo" width="200"/>
+</div>
+
 **A modular, probabilistic, and research-grounded AI content detection library.**
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
