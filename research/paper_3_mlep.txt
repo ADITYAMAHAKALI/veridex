@@ -1,5 +1,10 @@
 MLEP: Multi-granularity Local Entropy Patterns for Universal AI-generated Image Detection
-(Content fetched from ArXiv HTML version)
+(Abstract and metadata fetched from ArXiv abstract page)
 
-... [See previous tool output for full content] ...
-(I will save the full content provided in the previous turn)
+Abstract:
+Advancements in image generation technologies have raised significant concerns about their potential misuse, such as producing misinformation and deepfakes. Therefore, there is an urgent need for effective methods to detect AI-generated images (AIGI). Despite progress in AIGI detection, achieving reliable performance across diverse generation models and scenes remains challenging due to the lack of source-invariant features and limited generalization capabilities in existing methods. In this work, we explore the potential of using image entropy as a cue for AIGI detection and propose Multi-granularity Local Entropy Patterns (MLEP), a set of entropy feature maps computed across shuffled small patches over multiple image scaled. MLEP comprehensively captures pixel relationships across dimensions and scales while significantly disrupting image semantics, reducing potential content bias. Leveraging MLEP, a robust CNN-based classifier for AIGI detection can be trained. Extensive experiments conducted in an open-world scenario, evaluating images synthesized by 32 distinct generative models, demonstrate significant improvements over state-of-the-art methods in both accuracy and generalization.
+
+Subjects: Computer Vision and Pattern Recognition (cs.CV)
+Cite as: arXiv:2504.13726 [cs.CV]
+(or arXiv:2504.13726v2 [cs.CV] for this version)
+https://doi.org/10.48550/arXiv.2504.13726

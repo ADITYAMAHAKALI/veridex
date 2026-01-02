@@ -1,5 +1,10 @@
 C2P-CLIP: Injecting Category Common Prompt in CLIP to Enhance Generalization in Deepfake Detection
-(Content fetched from ArXiv HTML version)
+(Abstract and metadata fetched from ArXiv abstract page)
 
-... [See previous tool output for full content] ...
-(I will save the full content provided in the previous turn)
+Abstract:
+This work focuses on AIGC detection to develop universal detectors capable of identifying various types of forgery images. Recent studies have found large pre-trained models, such as CLIP, are effective for generalizable deepfake detection along with linear classifiers. However, two critical issues remain unresolved: 1) understanding why CLIP features are effective on deepfake detection through a linear classifier; and 2) exploring the detection potential of CLIP. In this study, we delve into the underlying mechanisms of CLIP's detection capabilities by decoding its detection features into text and performing word frequency analysis. Our finding indicates that CLIP detects deepfakes by recognizing similar concepts (Fig. \ref{fig:fig1} a). Building on this insight, we introduce Category Common Prompt CLIP, called C2P-CLIP, which integrates the category common prompt into the text encoder to inject category-related concepts into the image encoder, thereby enhancing detection performance (Fig. \ref{fig:fig1} b). Our method achieves a 12.41\% improvement in detection accuracy compared to the original CLIP, without introducing additional parameters during testing. Comprehensive experiments conducted on two widely-used datasets, encompassing 20 generation models, validate the efficacy of the proposed method, demonstrating state-of-the-art performance. The code is available at \url{this https URL}
+
+Subjects: Computer Vision and Pattern Recognition (cs.CV)
+Cite as: arXiv:2408.09647 [cs.CV]
+(or arXiv:2408.09647v2 [cs.CV] for this version)
+https://doi.org/10.48550/arXiv.2408.09647
