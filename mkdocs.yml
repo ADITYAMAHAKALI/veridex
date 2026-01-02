@@ -1,0 +1,48 @@
+site_name: Veridex
+site_description: A modular, probabilistic, and research-grounded AI content detection library.
+site_url: https://adityamahakali.github.io/veridex/
+repo_url: https://github.com/ADITYAMAHAKALI/veridex
+repo_name: ADITYAMAHAKALI/veridex
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - Concepts:
+    - Overview: concepts/index.md
+    - Text Signals: concepts/text.md
+    - Image Signals: concepts/image.md
+    - Audio Signals: concepts/audio.md
+  - Research:
+    - Overview: research/index.md
+  - API Reference:
+    - Core: api/core.md
+    - Text: api/text.md
+    - Image: api/image.md
+    - Audio: api/audio.md

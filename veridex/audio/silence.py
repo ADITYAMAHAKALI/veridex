@@ -1,6 +1,5 @@
 from typing import Any
 import numpy as np
-import librosa
 from veridex.core.signal import BaseSignal, DetectionResult
 
 class SilenceSignal(BaseSignal):
@@ -30,6 +29,8 @@ class SilenceSignal(BaseSignal):
         Runs silence analysis on the input audio file path or numpy array.
         """
         try:
+            self.check_dependencies()
+            import librosa
             if isinstance(input_data, str):
                 y, sr = librosa.load(input_data, sr=None)
             elif isinstance(input_data, tuple):
