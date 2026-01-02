@@ -182,3 +182,14 @@ CPU will work but may be slow.
 4. **Read documentation** for advanced usage
 
 See [README.md](../README.md) for more information.
+
+## Jupyter Notebooks
+
+For interactive tutorials and deep dives, check out the `examples/notebooks/` directory:
+
+1. **[Text Detection Deep Dive](notebooks/text_detection_deep_dive.ipynb)**
+   - Hands-on with Perplexity, Burstiness, and Binoculars.
+2. **[Image Forensics Analysis](notebooks/image_forensics_analysis.ipynb)**
+   - Visualizing frequency artifacts and DIRE heatmaps.
+3. **[Audio Synthetic Detection](notebooks/audio_synthetic_detection.ipynb)**
+   - Analyzing spectral features and using Wav2Vec.
