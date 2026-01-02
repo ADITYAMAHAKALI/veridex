@@ -12,6 +12,7 @@ from .detectgpt import DetectGPTSignal
 from .tdetect import TDetectSignal
 from .human_ood import HumanOODSignal
 from .binoculars import BinocularsSignal
+from .stylometry import StylometricSignal
 
 __all__ = [
     "ZlibEntropySignal",
@@ -19,5 +20,6 @@ __all__ = [
     "DetectGPTSignal",
     "TDetectSignal",
     "HumanOODSignal",
-    "BinocularsSignal"
+    "BinocularsSignal",
+    "StylometricSignal"
 ]

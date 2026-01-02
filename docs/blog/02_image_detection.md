@@ -1,5 +1,11 @@
 # Seeing Through the Noise: Detecting AI Images
 
+> [!NOTE]
+> **Prerequisites:** To run the code in this guide, install the necessary dependencies:
+> ```bash
+> pip install veridex[image]
+> ```
+
 As AI image generators like Midjourney, DALL-E 3, and Stable Diffusion become more photorealistic, distinguishing them from real photos is becoming increasingly difficult. However, these models leave behind invisible artifacts—mathematical traces of their generation process.
 
 This post explains how **Veridex** helps you uncover these hidden signals.
@@ -49,6 +55,20 @@ print(f"AI Probability: {result.score}")
 Sometimes, the clues are in the pixel statistics. AI images can have inconsistent noise patterns or "too smooth" textures in certain areas.
 
 **Veridex** provides `MLEPSignal` (Maximum Local Entropy Probability) to analyze local texture complexity.
+
+## 4. Error Level Analysis (ELA)
+
+When an image is saved as a JPEG, it undergoes lossy compression. If an image is edited (e.g., splicing a face onto a body) and then resaved, the edited part often has a different "error level" than the original background because it has been compressed a different number of times.
+
+**Veridex**'s `ELASignal` checks for these compression inconsistencies.
+
+```python
+from veridex.image import ELASignal
+
+detector = ELASignal()
+result = detector.detect("path/to/image.jpg")
+# High score suggests tampering or AI generation noise
+```
 
 ## Getting Started
 

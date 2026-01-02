@@ -1,5 +1,11 @@
 # The Sound of Synthetic: AI Audio Detection
 
+> [!NOTE]
+> **Prerequisites:** To run the code in this guide, install the necessary dependencies:
+> ```bash
+> pip install veridex[audio]
+> ```
+
 Voice cloning and text-to-speech (TTS) technologies have advanced rapidly. Models like ElevenLabs can clone a voice with just a few seconds of audio. This poses risks for impersonation and fraud.
 
 This post covers how **Veridex** tackles the challenge of deepfake audio detection.
@@ -45,6 +51,20 @@ print(f"Fake Probability: {result.score}")
 One surprisingly effective heuristic is breathing. Humans *must* breathe. We take breaths between phrases. Early TTS systems often forgot this, producing endless streams of speech without breath pauses. Newer models add breaths, but often at unnatural intervals or with incorrect acoustic properties.
 
 **Veridex** includes a `BreathingSignal` (experimental) to analyze breath patterns.
+
+## 4. Silence & Pause Analysis
+
+Synthesized speech often has unnatural pause patterns—either too perfect (robotic variance) or non-existent pauses where a human would naturally stop.
+
+**Veridex**'s `SilenceSignal` analyzes the silence ratio and pause duration variance found in the audio file.
+
+```python
+from veridex.audio import SilenceSignal
+
+detector = SilenceSignal()
+result = detector.detect("path/to/speech.wav")
+# Returns score based on silence heuristics
+```
 
 ## Conclusion
 

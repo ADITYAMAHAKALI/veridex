@@ -86,6 +86,7 @@ print(f"AI Probability: {result.score:.2f}")
 | `ZlibEntropySignal` | Compression-based | Fast | Low | No |
 | `PerplexitySignal` | Statistical (LLM-based) | Medium | Medium | Optional |
 | `BinocularsSignal` | Contrastive Perplexity | Medium | High | Optional |
+| `StylometricSignal` | Linguistic Analysis | Fast | Low | No |
 
 ### Audio Detectors
 
@@ -94,6 +95,7 @@ print(f"AI Probability: {result.score:.2f}")
 | `SpectralSignal` | Frequency Domain | Fast | Medium | No |
 | `AASISTSignal` | Spectro-Temporal | Medium | High | No |
 | `Wav2VecSignal` | Foundation Model | Slow | Very High | Recommended |
+| `SilenceSignal` | Pause Analysis | Fast | Low | No |
 
 ### Image Detectors
 
@@ -101,6 +103,7 @@ print(f"AI Probability: {result.score:.2f}")
 |----------|--------|-------|---------|--------------|
 | `FrequencyDomainSignal` | Spectral Analysis | Fast | Medium | No |
 | `DIRESignal` | Diffusion Reconstruction | Slow | High | Yes |
+| `ELASignal` | Error Level Analysis | Fast | Medium | No |
 
 ## 🧪 Testing
 
