@@ -12,10 +12,12 @@ from veridex.audio.spectral import SpectralSignal
 from veridex.audio.wav2vec_signal import Wav2VecSignal
 from veridex.audio.aasist_signal import AASISTSignal
 from veridex.audio.breathing_signal import BreathingSignal
+from veridex.audio.silence import SilenceSignal
 
 __all__ = [
     "SpectralSignal",
     "Wav2VecSignal",
     "AASISTSignal",
     "BreathingSignal",
+    "SilenceSignal",
 ]
