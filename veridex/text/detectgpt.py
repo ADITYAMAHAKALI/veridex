@@ -1,7 +1,5 @@
 import math
 import numpy as np
-import torch
-import torch.nn.functional as F
 from typing import Any, List, Optional
 from veridex.core.signal import BaseSignal, DetectionResult
 
@@ -42,7 +40,7 @@ class DetectGPTSignal(BaseSignal):
         self.span_length = span_length
         self.seed = seed
 
-        self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = device # Resolved lazily
 
         # Lazy loaded models
         self.base_model = None
@@ -73,7 +71,11 @@ class DetectGPTSignal(BaseSignal):
             return
 
         self.check_dependencies()
+        import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, AutoModelForSeq2SeqLM
+
+        if not self.device:
+            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         # Load Base Model (for scoring)
         self.base_tokenizer = AutoTokenizer.from_pretrained(self._base_model_name)
@@ -87,6 +89,8 @@ class DetectGPTSignal(BaseSignal):
 
     def _get_ll(self, text: str) -> float:
         """Computes the log-likelihood of a text under the base model."""
+        import torch
+        import torch.nn.functional as F
         with torch.no_grad():
             tokenized = self.base_tokenizer(text, return_tensors="pt").to(self.device)
             labels = tokenized.input_ids

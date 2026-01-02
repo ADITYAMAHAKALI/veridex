@@ -2,7 +2,6 @@ from typing import Any
 import os
 import tempfile
 import numpy as np
-from PIL import Image, ImageChops
 from veridex.core.signal import BaseSignal, DetectionResult
 
 class ELASignal(BaseSignal):
@@ -29,6 +28,15 @@ class ELASignal(BaseSignal):
         Runs ELA on the input image path or PIL Image.
         """
         try:
+            try:
+                from PIL import Image, ImageChops
+            except ImportError:
+                return DetectionResult(
+                    score=0.0,
+                    confidence=0.0,
+                    error="Pillow (PIL) is required. Install veridex[image]."
+                )
+
             if isinstance(input_data, str):
                 image = Image.open(input_data).convert('RGB')
             elif isinstance(input_data, Image.Image):
