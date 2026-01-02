@@ -66,6 +66,11 @@ markdown_extensions:
       generic: true
   - pymdownx.betterem:
       smart_enable: all
+  - pymdownx.blocks:
+      blocks:
+        - admonition
+        - details
+        - html
   - pymdownx.caret
   - pymdownx.details
   - pymdownx.emoji:

@@ -11,37 +11,31 @@
 
 Veridex is a production-ready library for detecting AI-generated content across multiple modalities: **text**, **image**, and **audio**. Unlike binary classifiers, Veridex provides **probabilistic detection** with confidence estimates and **interpretable signals**.
 
-<div class="feature-grid">
+<div class="grid cards" markdown>
 
-<div class="feature-card">
-  <h3>🎯 Multi-Modal</h3>
-  <p>Detect AI-generated text, images, and audio with a unified API</p>
-</div>
+-   **🎯 Multi-Modal**
 
-<div class="feature-card">
-  <h3>📊 Probabilistic</h3>
-  <p>Get confidence scores and probabilities, not just binary labels</p>
-</div>
+    Detect AI-generated text, images, and audio with a unified API
 
-<div class="feature-card">
-  <h3>🔍 Interpretable</h3>
-  <p>Access individual detection signals for transparency</p>
-</div>
+-   **📊 Probabilistic**
 
-<div class="feature-card">
-  <h3>🧩 Modular</h3>
-  <p>Easy to extend with new detection methods</p>
-</div>
+    Get confidence scores and probabilities, not just binary labels
 
-<div class="feature-card">
-  <h3>🚀 Production-Ready</h3>
-  <p>Robust error handling and graceful degradation</p>
-</div>
+-   **🔍 Interpretable**
 
-<div class="feature-card">
-  <h3>📖 Research-Grounded</h3>
-  <p>Based on state-of-the-art academic papers</p>
-</div>
+    Access individual detection signals for transparency
+
+-   **🧩 Modular**
+
+    Easy to extend with new detection methods
+
+-   **🚀 Production-Ready**
+
+    Robust error handling and graceful degradation
+
+-   **📖 Research-Grounded**
+
+    Based on state-of-the-art academic papers
 
 </div>
 
@@ -126,23 +120,13 @@ Veridex uses a **signal-based architecture** where each detector:
 
 ## Choose Your Path
 
-<div class="quick-links">
-  <a href="tutorials/quick_start/" class="quick-link">
-    <strong>🚀 Quick Start</strong><br>
-    Get running in 5 minutes
-  </a>
-  <a href="tutorials/text_detection_guide/" class="quick-link">
-    <strong>📝 Text Detection</strong><br>
-    Analyze LLM outputs
-  </a>
-  <a href="tutorials/image_detection_guide/" class="quick-link">
-    <strong>🖼️ Image Detection</strong><br>
-    Spot AI-generated images
-  </a>
-  <a href="tutorials/audio_detection_guide/" class="quick-link">
-    <strong>🎵 Audio Detection</strong><br>
-    Detect voice deepfakes
-  </a>
+<div class="grid cards" markdown>
+
+-   [**🚀 Quick Start**<br>Get running in 5 minutes](tutorials/quick_start.md)
+-   [**📝 Text Detection**<br>Analyze LLM outputs](tutorials/text_detection_guide.md)
+-   [**🖼️ Image Detection**<br>Spot AI-generated images](tutorials/image_detection_guide.md)
+-   [**🎵 Audio Detection**<br>Detect voice deepfakes](tutorials/audio_detection_guide.md)
+
 </div>
 
 ---
@@ -181,43 +165,14 @@ Veridex uses a **signal-based architecture** where each detector:
 
 ## Popular Guides
 
-<div class="feature-grid">
+<div class="grid cards" markdown>
 
-<div class="feature-card">
-  <h3>📖 Tutorials</h3>
-  <p>Step-by-step guides for each modality</p>
-  <a href="tutorials/index/">Browse Tutorials →</a>
-</div>
-
-<div class="feature-card">
-  <h3>🔍 Concepts</h3>
-  <p>Understand the architecture and signals</p>
-  <a href="concepts/index/">Learn Concepts →</a>
-</div>
-
-<div class="feature-card">
-  <h3>📘 API Reference</h3>
-  <p>Complete API documentation</p>
-  <a href="api/core/">View API Docs →</a>
-</div>
-
-<div class="feature-card">
-  <h3>❓ FAQ & Troubleshooting</h3>
-  <p>Common questions and solutions</p>
-  <a href="faq/">Get Help →</a>
-</div>
-
-<div class="feature-card">
-  <h3>🎯 Use Cases</h3>
-  <p>Real-world applications</p>
-  <a href="use_cases/">Explore Use Cases →</a>
-</div>
-
-<div class="feature-card">
-  <h3>⚡ Performance</h3>
-  <p>Optimization and benchmarking</p>
-  <a href="performance/">Optimize Performance →</a>
-</div>
+-   [**📖 Tutorials**<br>Step-by-step guides for each modality](tutorials/index.md)
+-   [**🔍 Concepts**<br>Understand the architecture and signals](concepts/index.md)
+-   [**📘 API Reference**<br>Complete API documentation](api/core.md)
+-   [**❓ FAQ & Troubleshooting**<br>Common questions and solutions](faq.md)
+-   [**🎯 Use Cases**<br>Real-world applications](use_cases.md)
+-   [**⚡ Performance**<br>Optimization and benchmarking](performance.md)
 
 </div>
 
@@ -260,15 +215,12 @@ Have questions or want to contribute?
 
 ---
 
-<div class="next-steps">
-  <h3>🎯 Next Steps</h3>
-  <ol>
-    <li><a href="getting_started/">Install Veridex</a> - Get the library installed</li>
-    <li><a href="tutorials/quick_start/">Try the Quick Start</a> - Run your first detection</li>
-    <li><a href="tutorials/index/">Explore Tutorials</a> - Deep dive into each modality</li>
-    <li><a href="../CONTRIBUTING/">Join the Community</a> - Contribute to the project</li>
-  </ol>
-</div>
+## Next Steps
+
+1.  [**Install Veridex**](getting_started.md) - Get the library installed
+2.  [**Try the Quick Start**](tutorials/quick_start.md) - Run your first detection
+3.  [**Explore Tutorials**](tutorials/index.md) - Deep dive into each modality
+4.  [**Join the Community**](CONTRIBUTING.md) - Contribute to the project
 
 ---
 

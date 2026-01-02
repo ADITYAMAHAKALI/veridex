@@ -26,91 +26,106 @@ graph TD
 
 ### 🚀 Getting Started
 
-<div class="feature-card">
-  <h3><a href="quick_start/">Quick Start (5 minutes)</a></h3>
-  <p>Get up and running with Veridex in under 5 minutes. Perfect for first-time users.</p>
-  <p><strong>You'll learn:</strong></p>
-  <ul>
-    <li>How to install Veridex</li>
-    <li>Run your first detection</li>
-    <li>Interpret results</li>
-  </ul>
-  <span class="badge badge-success">Beginner</span>
-  <span class="badge">5 min</span>
+<div class="grid cards" markdown>
+
+-   [**Quick Start (5 minutes)**](quick_start.md)
+
+    Get up and running with Veridex in under 5 minutes. Perfect for first-time users.
+
+    **You'll learn:**
+
+    - How to install Veridex
+    - Run your first detection
+    - Interpret results
+
+    <span class="badge badge-success">Beginner</span> <span class="badge">5 min</span>
+
 </div>
 
 ---
 
 ### 📝 Text Detection
 
-<div class="feature-card">
-  <h3><a href="text_detection_guide/">Text Detection Guide</a></h3>
-  <p>Learn to detect AI-generated text using various signals and techniques.</p>
-  <p><strong>You'll learn:</strong></p>
-  <ul>
-    <li>Choosing the right text detector</li>
-    <li>Understanding perplexity and burstiness</li>
-    <li>Using Binoculars for high accuracy</li>
-    <li>Interpreting linguistic signals</li>
-  </ul>
-  <span class="badge badge-success">Beginner-Intermediate</span>
-  <span class="badge">15 min</span>
+<div class="grid cards" markdown>
+
+-   [**Text Detection Guide**](text_detection_guide.md)
+
+    Learn to detect AI-generated text using various signals and techniques.
+
+    **You'll learn:**
+
+    - Choosing the right text detector
+    - Understanding perplexity and burstiness
+    - Using Binoculars for high accuracy
+    - Interpreting linguistic signals
+
+    <span class="badge badge-success">Beginner-Intermediate</span> <span class="badge">15 min</span>
+
 </div>
 
 ---
 
 ### 🖼️ Image Detection
 
-<div class="feature-card">
-  <h3><a href="image_detection_guide/">Image Detection Guide</a></h3>
-  <p>Master image deepfake detection with frequency analysis and diffusion techniques.</p>
-  <p><strong>You'll learn:</strong></p>
-  <ul>
-    <li>Image preprocessing best practices</li>
-    <li>Frequency domain analysis</li>
-    <li>Using DIRE for diffusion artifacts</li>
-    <li>Error Level Analysis (ELA)</li>
-    <li>GPU vs CPU considerations</li>
-  </ul>
-  <span class="badge badge-warning">Intermediate</span>
-  <span class="badge">20 min</span>
+<div class="grid cards" markdown>
+
+-   [**Image Detection Guide**](image_detection_guide.md)
+
+    Master image deepfake detection with frequency analysis and diffusion techniques.
+
+    **You'll learn:**
+
+    - Image preprocessing best practices
+    - Frequency domain analysis
+    - Using DIRE for diffusion artifacts
+    - Error Level Analysis (ELA)
+    - GPU vs CPU considerations
+
+    <span class="badge badge-warning">Intermediate</span> <span class="badge">20 min</span>
+
 </div>
 
 ---
 
 ### 🎵 Audio Detection
 
-<div class="feature-card">
-  <h3><a href="audio_detection_guide/">Audio Detection Guide</a></h3>
-  <p>Detect synthetic voice and deepfake audio using spectral and foundation model approaches.</p>
-  <p><strong>You'll learn:</strong></p>
-  <ul>
-    <li>Audio format requirements</li>
-    <li>Spectral analysis for quick screening</li>
-    <li>AASIST for anti-spoofing</li>
-    <li>Wav2Vec for production-grade detection</li>
-    <li>Silence pattern analysis</li>
-  </ul>
-  <span class="badge badge-warning">Intermediate</span>
-  <span class="badge">20 min</span>
+<div class="grid cards" markdown>
+
+-   [**Audio Detection Guide**](audio_detection_guide.md)
+
+    Detect synthetic voice and deepfake audio using spectral and foundation model approaches.
+
+    **You'll learn:**
+
+    - Audio format requirements
+    - Spectral analysis for quick screening
+    - AASIST for anti-spoofing
+    - Wav2Vec for production-grade detection
+    - Silence pattern analysis
+
+    <span class="badge badge-warning">Intermediate</span> <span class="badge">20 min</span>
+
 </div>
 
 ---
 
 ### 🎯 Advanced Topics
 
-<div class="feature-card">
-  <h3><a href="ensemble_detection/">Ensemble Detection</a></h3>
-  <p>Combine multiple signals for robust, production-ready detection.</p>
-  <p><strong>You'll learn:</strong></p>
-  <ul>
-    <li>Fusion strategies for multiple signals</li>
-    <li>Building custom detection pipelines</li>
-    <li>Confidence calibration</li>
-    <li>Production deployment patterns</li>
-  </ul>
-  <span class="badge badge-danger">Advanced</span>
-  <span class="badge">25 min</span>
+<div class="grid cards" markdown>
+
+-   [**Ensemble Detection**](ensemble_detection.md)
+
+    Combine multiple signals for robust, production-ready detection.
+
+    **You'll learn:**
+
+    - Fusion strategies for multiple signals
+    - Building custom detection pipelines
+    - Confidence calibration
+    - Production deployment patterns
+
+    <span class="badge badge-danger">Advanced</span> <span class="badge">25 min</span>
+
 </div>
 
 ---
@@ -152,7 +167,6 @@ If you get stuck:
 
 ---
 
-<div class="next-steps">
-  <h3>🎯 Ready to Start?</h3>
-  <p>Begin with the <a href="quick_start/">Quick Start Tutorial</a> to get hands-on experience!</p>
-</div>
+## Next Steps
+
+[**Ready to Start? Begin with the Quick Start Tutorial →**](quick_start.md){ .md-button .md-button--primary }

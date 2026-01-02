@@ -3,120 +3,32 @@
 /* Hero section styling */
 .md-typeset .hero {
   text-align: center;
-  padding: 2rem 0;
+  padding: 3rem 0;
 }
 
 .md-typeset .hero h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-}
-
-/* Feature cards */
-.md-typeset .feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
-.md-typeset .feature-card {
-  background: var(--md-code-bg-color);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  border: 1px solid var(--md-default-fg-color--lightest);
-  transition: all 0.3s ease;
-}
-
-.md-typeset .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.md-typeset .feature-card h3 {
-  margin-top: 0;
   color: var(--md-primary-fg-color);
 }
 
-/* Quick links styling */
-.md-typeset .quick-links {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.md-typeset .quick-link {
-  display: block;
-  padding: 1rem;
-  background: var(--md-primary-fg-color--light);
-  color: white;
-  text-decoration: none;
-  border-radius: 0.5rem;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.md-typeset .quick-link:hover {
-  background: var(--md-primary-fg-color);
-  transform: scale(1.05);
-}
-
-/* Comparison tables */
-.md-typeset table {
-  font-size: 0.85rem;
-}
-
-.md-typeset table th {
-  background: var(--md-primary-fg-color);
-  color: white;
-}
-
-/* Code blocks */
-.md-typeset pre > code {
-  border-radius: 0.5rem;
-}
-
-/* Navigation breadcrumbs */
-.md-typeset .breadcrumbs {
-  font-size: 0.85rem;
+.md-typeset .hero p {
+  font-size: 1.2rem;
   color: var(--md-default-fg-color--light);
-  margin-bottom: 1rem;
 }
 
-.md-typeset .breadcrumbs a {
-  color: var(--md-primary-fg-color);
-  text-decoration: none;
-}
-
-.md-typeset .breadcrumbs a:hover {
-  text-decoration: underline;
-}
-
-/* Next steps section */
-.md-typeset .next-steps {
-  background: var(--md-code-bg-color);
-  border-left: 4px solid var(--md-primary-fg-color);
-  padding: 1.5rem;
-  margin: 2rem 0;
-  border-radius: 0.25rem;
-}
-
-.md-typeset .next-steps h3 {
-  margin-top: 0;
-  color: var(--md-primary-fg-color);
-}
-
-/* Badge styles */
+/* Badge styles - keep these as they are useful inside cards */
 .md-typeset .badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.5rem;
   background: var(--md-primary-fg-color);
   color: white;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
+  border-radius: 0.2rem;
+  font-size: 0.7rem;
   font-weight: 600;
   margin-right: 0.5rem;
+  vertical-align: middle;
 }
 
 .md-typeset .badge.badge-success {
@@ -129,16 +41,4 @@
 
 .md-typeset .badge.badge-danger {
   background: #ef4444;
-}
-
-/* Responsive improvements */
-@media screen and (max-width: 768px) {
-  .md-typeset .hero h1 {
-    font-size: 1.75rem;
-  }
-  
-  .md-typeset .feature-grid,
-  .md-typeset .quick-links {
-    grid-template-columns: 1fr;
-  }
 }

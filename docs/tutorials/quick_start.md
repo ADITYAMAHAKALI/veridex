@@ -269,13 +269,20 @@ Congratulations! You've completed the quick start. 🎉
 
 ### Next Steps
 
-<div class="next-steps">
-  <ol>
-    <li><a href="text_detection_guide/">Text Detection Guide</a> - Deep dive into text analysis</li>
-    <li><a href="image_detection_guide/">Image Detection Guide</a> - Master image deepfake detection</li>
-    <li><a href="audio_detection_guide/">Audio Detection Guide</a> - Detect voice deepfakes</li>
-    <li><a href="ensemble_detection/">Ensemble Detection</a> - Combine multiple signals</li>
-  </ol>
+<div class="grid cards" markdown>
+
+-   [**Text Detection Guide**](text_detection_guide.md)
+    Deep dive into text analysis
+
+-   [**Image Detection Guide**](image_detection_guide.md)
+    Master image deepfake detection
+
+-   [**Audio Detection Guide**](audio_detection_guide.md)
+    Detect voice deepfakes
+
+-   [**Ensemble Detection**](ensemble_detection.md)
+    Combine multiple signals
+
 </div>
 
 ### Additional Resources
