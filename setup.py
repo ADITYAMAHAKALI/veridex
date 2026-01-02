@@ -9,13 +9,13 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="veridex",
-    version="0.1.0",
+    version="0.1.2",
     author="Veridex Contributors",
-    author_email="",
+    author_email="adityamahakali@aisolve.org",
     description="A modular, probabilistic, and research-grounded AI content detection library",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/example/veridex",
+    url="https://github.com/ADITYAMAHAKALI/veridex",
     packages=find_packages(exclude=["tests*", "examples*", "docs*"]),
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -47,6 +47,7 @@ setup(
             "diffusers>=0.20.0",
             "Pillow>=9.0.0",
             "opencv-python-headless>=4.0.0",
+            "scikit-image>=0.19.0",
         ],
         "audio": [
             "torch>=2.0.0",

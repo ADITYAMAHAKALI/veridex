@@ -1,9 +1,9 @@
 
 import numpy as np
 import torch
-import torch.nn.functional as F
-from typing import Optional, List
+from typing import Optional
 from veridex.core.signal import BaseSignal, DetectionResult
+from scipy.special import expit
 
 class HumanOODSignal(BaseSignal):
     """
@@ -158,7 +158,7 @@ class HumanOODSignal(BaseSignal):
             # P(Human) is related to CDF(z_dist).
 
             # Using sigmoid (-z_dist) so that high z (Human) gives low score.
-            score = 1.0 / (1.0 + np.exp(z_dist)) # If z=2 (far), score=0.12. If z=-2 (close), score=0.88.
+            score = expit(-z_dist) # Numerically stable version of 1 / (1 + exp(z_dist))
 
         else:
             return DetectionResult(score=0.0, confidence=0.0, error="Unsupported metric")

@@ -126,8 +126,8 @@ See [TESTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md)
 
 ## 📚 Documentation
 
-- **[Core Idea & Plan](https://github.com/ADITYAMAHAKALI/veridex/blob/main/core_idea_and_plan.md)** - Design philosophy and architecture
-- **[Research Document](https://github.com/ADITYAMAHAKALI/veridex/blob/main/AI-Generated%20Content%20Detection%20Research.md)** - Comprehensive technical analysis
+- **[Core Idea & Plan](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/plan.md)** - Design philosophy and architecture
+- **[Research Document](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/research.md)** - Comprehensive technical analysis
 - **[Testing Guide](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md)** - How to test all metrics
 - **Module READMEs**:
   - [Audio Detection](https://github.com/ADITYAMAHAKALI/veridex/blob/main/veridex/audio/README.md)
@@ -188,7 +188,7 @@ Veridex is based on cutting-edge research in AI-generated content detection. Key
 - **DIRE**: Diffusion Reconstruction Error for deepfake images
 - **Wav2Vec 2.0**: Self-supervised foundation models for audio
 
-See [AI-Generated Content Detection Research.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/AI-Generated%20Content%20Detection%20Research.md) for full references.
+See [docs/research.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/research.md) for full references.
 
 ## ⚠️ Limitations
 
@@ -215,6 +215,7 @@ Veridex is a **probabilistic detection tool**, not a definitive proof system:
 ## 📧 Contact
 
 For questions, issues, or contributions:
+- Email: adityamahakali@aisolve.org
 - Open an issue on GitHub
 - See [CONTRIBUTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/CONTRIBUTING.md)
 

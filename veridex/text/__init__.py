@@ -8,5 +8,16 @@ Provides detectors for identifying synthetic text:
 
 from .entropy import ZlibEntropySignal
 from .perplexity import PerplexitySignal
+from .detectgpt import DetectGPTSignal
+from .tdetect import TDetectSignal
+from .human_ood import HumanOODSignal
+from .binoculars import BinocularsSignal
 
-__all__ = [ "ZlibEntropySignal", "PerplexitySignal"]
+__all__ = [
+    "ZlibEntropySignal",
+    "PerplexitySignal",
+    "DetectGPTSignal",
+    "TDetectSignal",
+    "HumanOODSignal",
+    "BinocularsSignal"
+]

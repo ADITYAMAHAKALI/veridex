@@ -81,6 +81,9 @@ class TDetectSignal(DetectGPTSignal):
         except Exception:
              prob = float(np.mean(prob))
 
+        if math.isnan(prob):
+             prob = 0.5
+
         return DetectionResult(
             score=float(prob),
             confidence=0.85,

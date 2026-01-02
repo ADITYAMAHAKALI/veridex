@@ -154,7 +154,16 @@ class DetectGPTSignal(BaseSignal):
             z_score = float(z_score)
 
         # Convert z-score to probability [0, 1]
-        prob = 1.0 / (1.0 + math.exp(-z_score))
+        try:
+            if math.isnan(z_score):
+                prob = 0.5
+            else:
+                prob = 1.0 / (1.0 + math.exp(-z_score))
+        except OverflowError:
+            prob = 1.0 if z_score > 0 else 0.0
+
+        if math.isnan(prob):
+            prob = 0.5
 
         return DetectionResult(
             score=prob,

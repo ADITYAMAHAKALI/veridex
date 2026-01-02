@@ -31,6 +31,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A (initial release)
 
+## [0.1.2] - 2026-01-02
+
+### Changed
+- Updated package metadata and contact information
+- Bumped version to 0.1.2
+
 ## [0.1.0] - 2026-01-01
 
 ### Added
@@ -42,5 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive testing infrastructure
 - Example scripts and documentation
 
-[Unreleased]: https://github.com/example/veridex/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/example/veridex/releases/tag/v0.1.0
+[Unreleased]: https://github.com/ADITYAMAHAKALI/veridex/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/ADITYAMAHAKALI/veridex/releases/tag/v0.1.2
+[0.1.0]: https://github.com/ADITYAMAHAKALI/veridex/releases/tag/v0.1.0

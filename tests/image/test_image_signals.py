@@ -80,5 +80,84 @@ class TestDIRESignal(unittest.TestCase):
         self.assertIn("dire_mae", result.metadata)
         self.assertAlmostEqual(result.metadata["dire_mae"], 1.0, delta=0.1)
 
+    def test_dire_initialization(self):
+        """Test DIRE signal initialization."""
+        from veridex.image.dire import DIRESignal
+        
+        signal = DIRESignal(device="cpu")
+        self.assertEqual(signal.device, "cpu")
+
+    def test_dire_properties(self):
+        """Test DIRE signal properties."""
+        from veridex.image.dire import DIRESignal
+        
+        signal = DIRESignal()
+        self.assertEqual(signal.name, "dire_reconstruction")
+        self.assertEqual(signal.dtype, "image")
+
+    def test_dire_numpy_array_input(self):
+        """Test DIRE with numpy array input."""
+        from veridex.image.dire import DIRESignal
+        
+        class MockDIRESignal(DIRESignal):
+            def check_dependencies(self):
+                pass
+            
+            def _load_pipeline(self):
+                mock_pipeline = MagicMock()
+                mock_output = MagicMock()
+                mock_output.images = [Image.new("RGB", (512, 512), color="gray")]
+                mock_pipeline.return_value = mock_output
+                return mock_pipeline
+        
+        signal = MockDIRESignal(device="cpu")
+        img_array = np.random.randint(0, 256, (512, 512, 3), dtype=np.uint8)
+        
+        result = signal.run(img_array)
+        self.assertIsInstance(result, DetectionResult)
+
+    def test_dire_small_image(self):
+        """Test DIRE with smaller image."""
+        from veridex.image.dire import DIRESignal
+        
+        class MockDIRESignal(DIRESignal):
+            def check_dependencies(self):
+                pass
+            
+            def _load_pipeline(self):
+                mock_pipeline = MagicMock()
+                mock_output = MagicMock()
+                mock_output.images = [Image.new("RGB", (256, 256), color="red")]
+                mock_pipeline.return_value = mock_output
+                return mock_pipeline
+        
+        signal = MockDIRESignal(device="cpu")
+        input_img = Image.new("RGB", (256, 256), color="blue")
+        
+        result = signal.run(input_img)
+        self.assertIsInstance(result, DetectionResult)
+
+    def test_dire_score_bounds(self):
+        """Test that DIRE score stays within bounds."""
+        from veridex.image.dire import DIRESignal
+        
+        class MockDIRESignal(DIRESignal):
+            def check_dependencies(self):
+                pass
+            
+            def _load_pipeline(self):
+                mock_pipeline =MagicMock()
+                mock_output = MagicMock()
+                mock_output.images = [Image.new("RGB", (512, 512), color="black")]
+                mock_pipeline.return_value = mock_output
+                return mock_pipeline
+        
+        signal = MockDIRESignal(device="cpu")
+        input_img = Image.new("RGB", (512, 512), color="white")
+        
+        result = signal.run(input_img)
+        self.assertTrue(0.0 <= result.score <= 1.0)
+        self.assertTrue(0.0 <= result.confidence <= 1.0)
+
 if __name__ == "__main__":
     unittest.main()
