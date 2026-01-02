@@ -4,8 +4,28 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ADITYAMAHAKALI/veridex/blob/main/LICENSE)
+[![PyPI version](https://img.shields.io/badge/pypi-veridex-blue)](https://pypi.org/project/veridex/)
+[![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://adityamahakali.github.io/veridex/)
 
 Veridex is a production-ready library for detecting AI-generated content across multiple modalities: **text**, **image**, and **audio**. Unlike binary classifiers, Veridex provides probabilistic detection with confidence estimates and interpretable signals.
+
+---
+
+## 📑 Quick Navigation
+
+| Section | Description |
+|---------|-------------|
+| [✨ Features](#-features) | Key capabilities of Veridex |
+| [🚀 Quick Start](#-quick-start) | Installation and basic usage |
+| [📦 Available Detectors](#-available-detectors) | Complete detector comparison |
+| [🏗️ Architecture](#️-architecture) | System design and philosophy |
+| [📚 Documentation](#-documentation) | Guides, tutorials, and API reference |
+| [🧪 Testing](#-testing) | Running tests and coverage |
+| [🤝 Contributing](#-contributing) | How to contribute |
+| [🔬 Research](#-research--citations) | Academic papers and citations |
+| [⚠️ Limitations](#️-limitations) | Important usage constraints |
+
+---
 
 ## ✨ Features
 
@@ -77,33 +97,90 @@ result = detector.run("suspicious_image.png")
 print(f"AI Probability: {result.score:.2f}")
 ```
 
+**👉 [See more examples in the examples/ directory](examples/)**
+
+---
+
 ## 📦 Available Detectors
 
 ### Text Detectors
 
-| Detector | Method | Speed | Accuracy | GPU Required |
-|----------|--------|-------|----------|--------------|
-| `ZlibEntropySignal` | Compression-based | Fast | Low | No |
-| `PerplexitySignal` | Statistical (LLM-based) | Medium | Medium | Optional |
-| `BinocularsSignal` | Contrastive Perplexity | Medium | High | Optional |
-| `StylometricSignal` | Linguistic Analysis | Fast | Low | No |
+| Detector | Method | Speed | Accuracy | GPU Required | Use Case |
+|----------|--------|-------|----------|--------------|----------|
+| `ZlibEntropySignal` | Compression-based | ⚡ Fast | ⭐ Low | ❌ No | Quick first-pass screening |
+| `PerplexitySignal` | Statistical (LLM-based) | 🔄 Medium | ⭐⭐ Medium | 🔶 Optional | General-purpose detection |
+| `BinocularsSignal` | Contrastive Perplexity | 🔄 Medium | ⭐⭐⭐ High | 🔶 Optional | High-accuracy text analysis |
+| `StylometricSignal` | Linguistic Analysis | ⚡ Fast | ⭐ Low | ❌ No | Style pattern detection |
 
 ### Audio Detectors
 
-| Detector | Method | Speed | Accuracy | GPU Required |
-|----------|--------|-------|----------|--------------|
-| `SpectralSignal` | Frequency Domain | Fast | Medium | No |
-| `AASISTSignal` | Spectro-Temporal | Medium | High | No |
-| `Wav2VecSignal` | Foundation Model | Slow | Very High | Recommended |
-| `SilenceSignal` | Pause Analysis | Fast | Low | No |
+| Detector | Method | Speed | Accuracy | GPU Required | Use Case |
+|----------|--------|-------|----------|--------------|----------|
+| `SpectralSignal` | Frequency Domain | ⚡ Fast | ⭐⭐ Medium | ❌ No | Lightweight audio screening |
+| `AASISTSignal` | Spectro-Temporal | 🔄 Medium | ⭐⭐⭐ High | ❌ No | Anti-spoofing detection |
+| `Wav2VecSignal` | Foundation Model | 🐌 Slow | ⭐⭐⭐⭐ Very High | ✅ Recommended | Production-grade detection |
+| `SilenceSignal` | Pause Analysis | ⚡ Fast | ⭐ Low | ❌ No | Synthetic speech patterns |
 
 ### Image Detectors
 
-| Detector | Method | Speed | Accuracy | GPU Required |
-|----------|--------|-------|---------|--------------|
-| `FrequencyDomainSignal` | Spectral Analysis | Fast | Medium | No |
-| `DIRESignal` | Diffusion Reconstruction | Slow | High | Yes |
-| `ELASignal` | Error Level Analysis | Fast | Medium | No |
+| Detector | Method | Speed | Accuracy | GPU Required | Use Case |
+|----------|--------|-------|---------|--------------| ---------|
+| `FrequencyDomainSignal` | Spectral Analysis | ⚡ Fast | ⭐⭐ Medium | ❌ No | Quick image screening |
+| `DIRESignal` | Diffusion Reconstruction | 🐌 Slow | ⭐⭐⭐ High | ✅ Yes | High-accuracy AI image detection |
+| `ELASignal` | Error Level Analysis | ⚡ Fast | ⭐⭐ Medium | ❌ No | Image manipulation detection |
+
+**💡 See [Choosing the Right Detector](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/index.md) for guidance**
+
+---
+
+## 🏗️ Architecture
+
+Veridex follows a signal-based architecture:
+
+```
+Input → Signal Extractors → Normalization → Fusion → Output
+                ↓
+    (Independent, Inspectable Signals)
+```
+
+Each detector:
+- Inherits from `BaseSignal`
+- Returns standardized `DetectionResult`
+- Operates independently
+- Declares its limitations explicitly
+
+**Learn more:** [Architecture Documentation](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/index.md)
+
+---
+
+## 📚 Documentation
+
+### 📖 Guides & Tutorials
+- **[Getting Started Guide](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/getting_started.md)** - Installation and first steps
+- **[Text Detection Tutorial](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/text_detection_example.py)** - Step-by-step text analysis
+- **[Image Detection Tutorial](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/image_detection_example.py)** - Image deepfake detection
+- **[Audio Detection Tutorial](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/audio_detection_example.py)** - Voice deepfake detection
+- **[Examples Directory](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/README.md)** - Comprehensive examples
+
+### 🔍 Concepts
+- **[Core Concepts](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/index.md)** - Signal-based architecture
+- **[Text Signals](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/text.md)** - Understanding text detection
+- **[Image Signals](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/image.md)** - Understanding image detection
+- **[Audio Signals](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/audio.md)** - Understanding audio detection
+
+### 📘 API Reference
+- **[Core API](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/api/core.md)** - BaseSignal, DetectionResult
+- **[Text API](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/api/text.md)** - Text detectors
+- **[Image API](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/api/image.md)** - Image detectors
+- **[Audio API](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/api/audio.md)** - Audio detectors
+
+### 🔬 Technical Documentation
+- **[Design Philosophy](https://github.com/ADITYAMAHAKALI/veridex/blob/main/project_notes/plan.md)** - System design and architecture
+- **[Research Document](https://github.com/ADITYAMAHAKALI/veridex/blob/main/project_notes/research.md)** - Comprehensive technical analysis
+- **[Testing Guide](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md)** - How to test all metrics
+- **[Contributing Guide](https://github.com/ADITYAMAHAKALI/veridex/blob/main/CONTRIBUTING.md)** - Development guidelines
+
+---
 
 ## 🧪 Testing
 
@@ -125,32 +202,9 @@ pytest tests/audio/ -v
 pytest tests/ --cov=veridex --cov-report=html
 ```
 
-See [TESTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md) for detailed testing guide.
+**See [TESTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md) for detailed testing guide.**
 
-## 📚 Documentation
-
-- **[Core Idea & Plan](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/plan.md)** - Design philosophy and architecture
-- **[Research Document](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/research.md)** - Comprehensive technical analysis
-- **[Testing Guide](https://github.com/ADITYAMAHAKALI/veridex/blob/main/TESTING.md)** - How to test all metrics
-- **Module READMEs**:
-  - [Audio Detection](https://github.com/ADITYAMAHAKALI/veridex/blob/main/veridex/audio/README.md)
-  - Examples in `examples/` directory
-
-## 🏗️ Architecture
-
-Veridex follows a signal-based architecture:
-
-```
-Input → Signal Extractors → Normalization → Fusion → Output
-                ↓
-    (Independent, Inspectable Signals)
-```
-
-Each detector:
-- Inherits from `BaseSignal`
-- Returns standardized `DetectionResult`
-- Operates independently
-- Declares its limitations explicitly
+---
 
 ## 🤝 Contributing
 
@@ -178,9 +232,13 @@ black veridex/ tests/
 flake8 veridex/
 ```
 
+---
+
 ## 📄 License
 
 Apache License 2.0 - See [LICENSE](https://github.com/ADITYAMAHAKALI/veridex/blob/main/LICENSE) for details.
+
+---
 
 ## 🔬 Research & Citations
 
@@ -191,7 +249,9 @@ Veridex is based on cutting-edge research in AI-generated content detection. Key
 - **DIRE**: Diffusion Reconstruction Error for deepfake images
 - **Wav2Vec 2.0**: Self-supervised foundation models for audio
 
-See [docs/research.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/research.md) for full references.
+**See [Research Documentation](https://github.com/ADITYAMAHAKALI/veridex/blob/main/project_notes/research.md) for full references.**
+
+---
 
 ## ⚠️ Limitations
 
@@ -204,6 +264,8 @@ Veridex is a **probabilistic detection tool**, not a definitive proof system:
 
 **Always use multiple signals and human judgment for critical decisions.**
 
+---
+
 ## 🗺️ Roadmap
 
 - [x] Text detection (Perplexity, Binoculars)
@@ -215,12 +277,21 @@ Veridex is a **probabilistic detection tool**, not a definitive proof system:
 - [ ] Real-time streaming detection
 - [ ] Model calibration on benchmarks
 
+---
+
 ## 📧 Contact
 
 For questions, issues, or contributions:
-- Email: adityamahakali@aisolve.org
-- Open an issue on GitHub
-- See [CONTRIBUTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/CONTRIBUTING.md)
+- **Email**: adityamahakali@aisolve.org
+- **Issues**: [GitHub Issues](https://github.com/ADITYAMAHAKALI/veridex/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ADITYAMAHAKALI/veridex/discussions)
+- **Contributing**: [CONTRIBUTING.md](https://github.com/ADITYAMAHAKALI/veridex/blob/main/CONTRIBUTING.md)
+
+---
+
+## 🌟 Star History
+
+If you find Veridex useful, please consider giving it a ⭐ on GitHub!
 
 ---
 

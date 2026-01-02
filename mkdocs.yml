@@ -3,46 +3,176 @@ site_description: A modular, probabilistic, and research-grounded AI content det
 site_url: https://adityamahakali.github.io/veridex/
 repo_url: https://github.com/ADITYAMAHAKALI/veridex
 repo_name: ADITYAMAHAKALI/veridex
+edit_uri: edit/main/docs/
+
+# Copyright
+copyright: Copyright &copy; 2024-2026 Aditya Mahakali
 
 theme:
   name: material
+  language: en
   features:
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.tracking
+    - navigation.instant
+    - navigation.instant.progress
+    - search.suggest
+    - search.highlight
+    - search.share
     - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
   palette:
+    # Light mode
     - scheme: default
       primary: teal
       accent: purple
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+    # Dark mode
     - scheme: slate
       primary: teal
       accent: purple
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/shield-check
 
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Plugins
 plugins:
-  - search
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
   - mkdocstrings:
       handlers:
         python:
           paths: [.]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
 
+# Extra CSS and JavaScript
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+# Social links
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ADITYAMAHAKALI/veridex
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/veridex/
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >-
+            Thanks for your feedback! Help us improve by 
+            <a href="https://github.com/ADITYAMAHAKALI/veridex/issues/new" target="_blank" rel="noopener">opening an issue</a>.
+
+# Navigation structure
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
+  
+  - Tutorials:
+    - Overview: tutorials/index.md
+    - Quick Start (5 min): tutorials/quick_start.md
+    - Text Detection Guide: tutorials/text_detection_guide.md
+    - Image Detection Guide: tutorials/image_detection_guide.md
+    - Audio Detection Guide: tutorials/audio_detection_guide.md
+    - Ensemble Detection: tutorials/ensemble_detection.md
+  
   - Concepts:
     - Overview: concepts/index.md
     - Text Signals: concepts/text.md
     - Image Signals: concepts/image.md
     - Audio Signals: concepts/audio.md
-  - Research:
-    - Overview: research/index.md
+  
   - API Reference:
     - Core: api/core.md
     - Text: api/text.md
     - Image: api/image.md
     - Audio: api/audio.md
+  
+  - Guides:
+    - Use Cases: use_cases.md
+    - Performance Optimization: performance.md
+    - Troubleshooting: troubleshooting.md
+    - FAQ: faq.md
+  
+  - Research:
+    - Overview: research/index.md
+  
+  - Development:
+    - Contributing: CONTRIBUTING.md
+    - Testing: TESTING.md
+    - Changelog: CHANGELOG.md
