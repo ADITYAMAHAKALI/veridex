@@ -10,12 +10,12 @@ Veridex provides multiple signals for detecting AI-generated images, from quick 
 
 ## Available Detectors
 
-### 1. FrequencyDomainSignal (Recommended for Quick Screening)
+### 1. FrequencySignal (Recommended for Quick Screening)
 
 ```python
-from veridex.image import FrequencyDomainSignal
+from veridex.image import FrequencySignal
 
-detector = FrequencyDomainSignal()
+detector = FrequencySignal()
 result = detector.run("image.png")
 
 print(f"AI Probability: {result.score:.2%}")

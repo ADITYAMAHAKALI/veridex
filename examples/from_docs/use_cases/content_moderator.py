@@ -8,7 +8,7 @@ Source: docs/use_cases.md (lines 21-63)
 """
 
 from veridex.text import PerplexitySignal, StylometricSignal
-from veridex.image import FrequencyDomainSignal
+from veridex.image import FrequencySignal
 
 
 class ContentModerator:
@@ -16,7 +16,7 @@ class ContentModerator:
     
     def __init__(self):
         self.text_detector = PerplexitySignal()
-        self.image_detector = FrequencyDomainSignal()
+        self.image_detector = FrequencySignal()
     
     def moderate_post(self, post):
         """

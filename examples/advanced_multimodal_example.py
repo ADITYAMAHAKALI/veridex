@@ -63,16 +63,22 @@ def test_advanced_text():
     This allows for reduced carbon emissions but requires careful management.
     """
 
-    detectors = [
-        ("DetectGPT (Curvature)", DetectGPTSignal()),
-        ("T-Detect (Robust)", TDetectSignal()),
-        ("HumanOOD (Distance)", HumanOODSignal(n_samples=5)) # Reduced samples for speed
+    detector_configs = [
+        ("DetectGPT (Curvature)", DetectGPTSignal, {"base_model_name": "distilgpt2", "n_perturbations": 2, "device": "cpu"}),
+        ("T-Detect (Robust)", TDetectSignal, {"base_model_name": "distilgpt2", "n_perturbations": 2, "device": "cpu"}),
+        # ("HumanOOD (Distance)", HumanOODSignal, {"model_name": "distilgpt2", "n_samples": 1, "device": "cpu"})
     ]
 
-    for name, detector in detectors:
+    for name, cls, kwargs in detector_configs:
         print(f"\n🔹 Testing {name}...")
+        # Instantiate and run one by one to save memory
+        detector = cls(**kwargs)
         res = detector.run(ai_text)
         print_result(name, res)
+        # Help GC
+        del detector
+        import gc
+        gc.collect()
 
 def test_advanced_image():
     print_header("Image Modality: Visual Artifacts & Semantics")

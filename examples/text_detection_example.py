@@ -7,7 +7,7 @@ to analyze text for AI-generated content.
 
 def example_zlib_entropy():
     """Example: Lightweight compression-based detection."""
-    from veridex.text import ZlibEntropySignal
+    from veridex.text import ZlibEntropySignal, StylometricSignal
     
     # Initialize detector (no dependencies required)
     detector = ZlibEntropySignal()
@@ -40,6 +40,33 @@ def example_zlib_entropy():
     print(f"\nAI-like Text:")
     print(f"  AI Probability: {result_ai.score:.2f}")
     print(f"  Compression Ratio: {result_ai.metadata['zlib_ratio']:.2f}")
+
+
+def example_stylometric():
+    """Example: Stylometric analysis (vocabulary richness)."""
+    from veridex.text import StylometricSignal
+    
+    print("\n" + "=" * 60)
+    print("Stylometric Analysis (Linguistic Features)")
+    print("=" * 60)
+    
+    detector = StylometricSignal()
+    
+    text = """
+    The rapid advancement of deep learning frameworks has precipitated 
+    a paradigm shift in computational linguistics. Neural architectures 
+    now demonstrate capabilities that were previously considered unique 
+    to biological intelligence.
+    """
+    
+    result = detector.run(text)
+    
+    print(f"\nAI Probability: {result.score:.2f}")
+    print(f"Confidence: {result.confidence:.2f}")
+    print(f"Metrics:")
+    print(f"  Type-Token Ratio: {result.metadata['type_token_ratio']:.2f}")
+    print(f"  Avg Sentence Length: {result.metadata['avg_sentence_length']:.2f}")
+    print(f"  Special Char Ratio: {result.metadata['special_char_ratio']:.2f}")
 
 
 def example_perplexity():
@@ -192,10 +219,13 @@ if __name__ == "__main__":
     # 1. Lightweight entropy detection (always works)
     example_zlib_entropy()
     
-    # 2. Perplexity detection (requires transformers)
+    # 2. Stylometric analysis (fast, no dependencies)
+    example_stylometric()
+    
+    # 3. Perplexity detection (requires transformers)
     example_perplexity()
     
-    # 3. Advanced Binoculars (requires heavy models)
+    # 4. Advanced Binoculars (requires heavy models)
     # example_binoculars()  # Uncomment if you have models installed
     
     # 4. Multi-detector ensemble

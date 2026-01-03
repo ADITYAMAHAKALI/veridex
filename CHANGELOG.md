@@ -31,6 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A (initial release)
 
+## [0.1.3] - 2026-01-03
+
+### Changed
+- Improved README and documentation structure for better readability
+- Updated package logo
+- General dependency checks and maintenance
+
 ## [0.1.2] - 2026-01-02
 
 ### Changed

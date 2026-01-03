@@ -91,7 +91,7 @@ def confidence_voting(text, confidence_threshold=0.6):
 def multimodal_detection(content):
     """Multi-Modal Ensemble - Combine text, image, and audio"""
     from veridex.text import PerplexitySignal
-    from veridex.image import FrequencyDomainSignal
+    from veridex.image import FrequencySignal
     from veridex.audio import SpectralSignal
     
     results = {}
@@ -101,7 +101,7 @@ def multimodal_detection(content):
         results['text'] = text_detector.run(content['text'])
     
     if content.get('image'):
-        image_detector = FrequencyDomainSignal()
+        image_detector = FrequencySignal()
         results['image'] = image_detector.run(content['image'])
     
     if content.get('audio'):

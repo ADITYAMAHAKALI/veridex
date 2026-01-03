@@ -71,9 +71,9 @@ Confidence: 65%
 Detect AI-generated images:
 
 ```python
-from veridex.image import FrequencyDomainSignal
+from veridex.image import FrequencySignal
 
-detector = FrequencyDomainSignal()
+detector = FrequencySignal()
 result = detector.run("path/to/image.png")
 
 print(f"AI Probability: {result.score:.2%}")
@@ -144,9 +144,9 @@ Each detector provides modality-specific metadata:
 === "Image"
 
     ```python
-    from veridex.image import FrequencyDomainSignal
+    from veridex.image import FrequencySignal
     
-    detector = FrequencyDomainSignal()
+    detector = FrequencySignal()
     result = detector.run("image.png")
     
     # Access metadata
@@ -195,14 +195,14 @@ for DetectorClass in [PerplexitySignal, ZlibEntropySignal, StylometricSignal]:
 
 ```python
 from veridex.image import (
-    FrequencyDomainSignal,  # Fast spectral analysis
+    FrequencySignal,  # Fast spectral analysis
     ELASignal,              # Error level analysis
     # DIRESignal,           # High accuracy (requires GPU)
 )
 
 image_path = "image.png"
 
-for DetectorClass in [FrequencyDomainSignal, ELASignal]:
+for DetectorClass in [FrequencySignal, ELASignal]:
     detector = DetectorClass()
     result = detector.run(image_path)
     print(f"{detector.__class__.__name__}: {result.score:.2%}")

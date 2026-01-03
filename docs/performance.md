@@ -50,7 +50,7 @@ Veridex performance varies by detector and hardware:
 
 | Detector | Speed (1024x1024) | Memory | GPU Benefit |
 |----------|------------------|--------|-------------|
-| `FrequencyDomainSignal` | <1s | ~200MB | ❌ Minimal |
+| `FrequencySignal` | <1s | ~200MB | ❌ Minimal |
 | `ELASignal` | <1s | ~200MB | ❌ Minimal |
 | `DIRESignal` | 30-60s (CPU)<br>3-5s (GPU) | ~5GB | ✅ 10-20x |
 

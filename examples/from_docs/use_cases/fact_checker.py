@@ -8,7 +8,7 @@ Source: docs/use_cases.md (lines 151-213)
 """
 
 from veridex.text import PerplexitySignal
-from veridex.image import FrequencyDomainSignal, ELASignal
+from veridex.image import FrequencySignal, ELASignal
 from veridex.audio import Wav2VecSignal
 
 
@@ -17,7 +17,7 @@ class FactChecker:
     
     def __init__(self):
         self.text_detector = PerplexitySignal()
-        self.image_detector_1 = FrequencyDomainSignal()
+        self.image_detector_1 = FrequencySignal()
         self.image_detector_2 = ELASignal()
         self.audio_detector = Wav2VecSignal()
     

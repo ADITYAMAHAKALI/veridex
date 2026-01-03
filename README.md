@@ -40,6 +40,13 @@ Veridex is a production-ready library for detecting AI-generated content across 
 - 🚀 **Production-Ready**: Robust error handling, graceful degradation
 - 📖 **Research-Grounded**: Based on state-of-the-art papers and benchmarks
 
+## 💡 Use Cases
+
+- **🛡️ Content Moderation**: Automatically flag AI-generated spam, fake profiles, and synthetic media.
+- **🎓 Academic Integrity**: Verify the authenticity of student essays and research papers.
+- **📰 Journalism & Media**: Validate sources and detect deepfake imagery in news gathering.
+- **🎨 Copyright Protection**: Distinguish between human-created art and generative AI outputs.
+
 ## 🚀 Quick Start
 
 ### Installation
@@ -92,10 +99,10 @@ print(f"Spectral Features: {result.metadata}")
 #### Image Detection
 
 ```python
-from veridex.image import FrequencyDomainSignal
+from veridex.image import FrequencySignal
 
 # Analyze spectral anomalies
-detector = FrequencyDomainSignal()
+detector = FrequencySignal()
 result = detector.run("suspicious_image.png")
 
 print(f"AI Probability: {result.score:.2f}")
@@ -129,7 +136,7 @@ print(f"AI Probability: {result.score:.2f}")
 
 | Detector | Method | Speed | Accuracy | GPU Required | Use Case |
 |----------|--------|-------|---------|--------------| ---------|
-| `FrequencyDomainSignal` | Spectral Analysis | ⚡ Fast | ⭐⭐ Medium | ❌ No | Quick image screening |
+| `FrequencySignal` | Spectral Analysis | ⚡ Fast | ⭐⭐ Medium | ❌ No | Quick image screening |
 | `DIRESignal` | Diffusion Reconstruction | 🐌 Slow | ⭐⭐⭐ High | ✅ Yes | High-accuracy AI image detection |
 | `ELASignal` | Error Level Analysis | ⚡ Fast | ⭐⭐ Medium | ❌ No | Image manipulation detection |
 

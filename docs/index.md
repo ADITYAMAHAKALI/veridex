@@ -2,7 +2,6 @@
 
 <div align="center">
   <img src="images/logo.png" alt="Veridex Logo" width="250"/>
-  <h1>🔍 Veridex</h1>
   <p><strong>A modular, probabilistic, and research-grounded AI content detection library</strong></p>
 </div>
 
@@ -70,10 +69,10 @@ Get started with Veridex in under 5 minutes:
 === "Image Detection"
 
     ```python
-    from veridex.image import FrequencyDomainSignal
+    from veridex.image import FrequencySignal
     
     # Initialize detector
-    detector = FrequencyDomainSignal()
+    detector = FrequencySignal()
     
     # Analyze image
     result = detector.run("image.png")
@@ -163,7 +162,7 @@ Veridex uses a **signal-based architecture** where each detector:
 
 | Signal | Method | Speed | Accuracy | Best For |
 |--------|--------|-------|----------|----------|
-| `FrequencyDomainSignal` | Spectral | Fast | ⭐⭐ | Quick screening |
+| `FrequencySignal` | Spectral | Fast | ⭐⭐ | Quick screening |
 | `DIRESignal` | Diffusion | Slow | ⭐⭐⭐ | High accuracy |
 | `ELASignal` | Error Level | Fast | ⭐⭐ | Manipulation detection |
 

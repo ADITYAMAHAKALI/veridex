@@ -19,10 +19,10 @@ def example_1_basic_text_detection():
 
 
 def example_2_basic_image_detection():
-    """Basic image detection with FrequencyDomainSignal"""
-    from veridex.image import FrequencyDomainSignal
+    """Basic image detection with FrequencySignal"""
+    from veridex.image import FrequencySignal
 
-    detector = FrequencyDomainSignal()
+    detector = FrequencySignal()
     result = detector.run("path/to/image.png")
 
     print(f"AI Probability: {result.score:.2%}")
@@ -67,9 +67,9 @@ def example_5_text_metadata():
 
 def example_6_image_metadata():
     """Exploring metadata for image detection"""
-    from veridex.image import FrequencyDomainSignal
+    from veridex.image import FrequencySignal
     
-    detector = FrequencyDomainSignal()
+    detector = FrequencySignal()
     result = detector.run("image.png")
     
     # Access metadata
@@ -109,14 +109,14 @@ def example_8_multiple_text_detectors():
 def example_9_multiple_image_detectors():
     """Try multiple image detectors"""
     from veridex.image import (
-        FrequencyDomainSignal,  # Fast spectral analysis
+        FrequencySignal,  # Fast spectral analysis
         ELASignal,              # Error level analysis
         # DIRESignal,           # High accuracy (requires GPU)
     )
 
     image_path = "image.png"
 
-    for DetectorClass in [FrequencyDomainSignal, ELASignal]:
+    for DetectorClass in [FrequencySignal, ELASignal]:
         detector = DetectorClass()
         result = detector.run(image_path)
         print(f"{detector.__class__.__name__}: {result.score:.2%}")

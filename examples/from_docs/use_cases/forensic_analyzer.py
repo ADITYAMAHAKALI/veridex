@@ -15,7 +15,7 @@ class ForensicAnalyzer:
     """Legal and forensic document analysis for discovery"""
     
     def __init__(self):
-        self.detector_high_accuracy = BinocularsSignal()
+        self.detector_high_accuracy = BinocularsSignal(observer_id="distilgpt2", performer_id="gpt2")
         self.detector_fast = PerplexitySignal()
     
     def analyze_document_batch(self, documents):

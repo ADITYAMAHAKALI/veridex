@@ -117,7 +117,7 @@ Use this decision matrix:
 - Balanced → `PerplexitySignal`
 
 **Image**:
-- Quick screening → `FrequencyDomainSignal`
+- Quick screening → `FrequencySignal`
 - High accuracy → `DIRESignal` (requires GPU)
 - Manipulation detection → `ELASignal`
 
@@ -190,7 +190,7 @@ Approximate processing times (CPU):
 - `BinocularsSignal`: 10-20s
 
 **Image** (1024x1024):
-- `FrequencyDomainSignal`: <1s
+- `FrequencySignal`: <1s
 - `ELASignal`: <1s
 - `DIRESignal`: 30-60s (GPU: 3-5s)
 

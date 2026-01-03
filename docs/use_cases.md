@@ -20,12 +20,12 @@ Social media platforms and online communities need to identify AI-generated spam
 
 ```python
 from veridex.text import PerplexitySignal, StylometricSignal
-from veridex.image import FrequencyDomainSignal
+from veridex.image import FrequencySignal
 
 class ContentModerator:
     def __init__(self):
         self.text_detector = PerplexitySignal()
-        self.image_detector = FrequencyDomainSignal()
+        self.image_detector = FrequencySignal()
     
     def moderate_post(self, post):
         results = {}
@@ -85,7 +85,7 @@ from veridex.text import BinocularsSignal, PerplexitySignal
 class EssayChecker:
     def __init__(self):
         # Use high-accuracy detector for academic use
-        self.primary_detector = BinocularsSignal()
+        self.primary_detector = BinocularsSignal(observer_id="distilgpt2", performer_id="gpt2")
         self.secondary_detector = PerplexitySignal()
     
     def analyze_essay(self, essay_text):
@@ -150,13 +150,13 @@ News organizations need to verify content authenticity and detect AI-generated m
 
 ```python
 from veridex.text import PerplexitySignal
-from veridex.image import FrequencyDomainSignal, ELASignal
+from veridex.image import FrequencySignal, ELASignal
 from veridex.audio import Wav2VecSignal
 
 class FactChecker:
     def __init__(self):
         self.text_detector = PerplexitySignal()
-        self.image_detector_1 = FrequencyDomainSignal()
+        self.image_detector_1 = FrequencySignal()
         self.image_detector_2 = ELASignal()
         self.audio_detector = Wav2VecSignal()
     
@@ -242,7 +242,7 @@ import pandas as pd
 
 class ForensicAnalyzer:
     def __init__(self):
-        self.detector_high_accuracy = BinocularsSignal()
+        self.detector_high_accuracy = BinocularsSignal(observer_id="distilgpt2", performer_id="gpt2")
         self.detector_fast = PerplexitySignal()
     
     def analyze_document_batch(self, documents):
@@ -298,12 +298,12 @@ Companies need to ensure customer-facing content complies with disclosure requir
 
 ```python
 from veridex.text import PerplexitySignal
-from veridex.image import FrequencyDomainSignal
+from veridex.image import FrequencySignal
 
 class ComplianceScanner:
     def __init__(self, threshold=0.7):
         self.text_detector = PerplexitySignal()
-        self.image_detector = FrequencyDomainSignal()
+        self.image_detector = FrequencySignal()
         self.threshold = threshold
     
     def scan_marketing_content(self, content):

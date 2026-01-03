@@ -9,6 +9,7 @@ This directory contains practical examples for using veridex detection capabilit
 
 Examples include:
 - **Zlib Entropy** - Lightweight compression-based detection (no dependencies)
+- **Stylometric Analysis** - Linguistic feature analysis (vocabulary richness)
 - **Perplexity & Burstiness** - Statistical analysis with GPT-2
 - **Binoculars** - Advanced contrastive perplexity (requires heavy models)
 - **Multi-detector Ensemble** - Combining multiple signals
@@ -24,6 +25,7 @@ python examples/text_detection_example.py
 
 Examples include:
 - **Frequency Domain** - Fast spectral analysis
+- **ELA** - Error Level Analysis for manipulation detection
 - **DIRE** - Diffusion reconstruction error (requires GPU)
 - **Batch Image Analysis** - Processing multiple images
 - **Image Preprocessing** - Best practices for clean detection
@@ -41,6 +43,7 @@ python examples/image_detection_example.py
 
 Examples include:
 - **Spectral Detection** - Lightweight frequency analysis
+- **Silence Analysis** - Pause pattern detection
 - **AASIST** - Spectro-temporal features
 - **Wav2Vec 2.0** - Foundation model detection
 - **Ensemble Detection** - Combining multiple audio detectors
@@ -51,6 +54,21 @@ Examples include:
 # Requires audio dependencies
 pip install veridex[audio]
 python examples/audio_detection_example.py
+```
+
+### 4. Advanced Multimodal Detection
+**File:** [advanced_multimodal_example.py](advanced_multimodal_example.py)
+
+Demonstrates advanced and experimental signals:
+- **Text**: DetectGPT, T-Detect, HumanOOD (Zero-shot methods)
+- **Image**: CLIP Zero-Shot, MLEP (Entropy Patterns)
+- **Audio**: Breathing Pattern Analysis
+
+**Run:**
+```bash
+# Requires all dependencies
+pip install veridex[text,image,audio]
+python examples/advanced_multimodal_example.py
 ```
 
 ## Quick Start

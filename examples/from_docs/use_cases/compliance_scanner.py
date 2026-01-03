@@ -8,7 +8,7 @@ Source: docs/use_cases.md (lines 299-338)
 """
 
 from veridex.text import PerplexitySignal
-from veridex.image import FrequencyDomainSignal
+from veridex.image import FrequencySignal
 
 
 class ComplianceScanner:
@@ -16,7 +16,7 @@ class ComplianceScanner:
     
     def __init__(self, threshold=0.7):
         self.text_detector = PerplexitySignal()
-        self.image_detector = FrequencyDomainSignal()
+        self.image_detector = FrequencySignal()
         self.threshold = threshold
     
     def scan_marketing_content(self, content):

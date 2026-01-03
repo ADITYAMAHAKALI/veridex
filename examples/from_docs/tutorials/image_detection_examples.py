@@ -9,10 +9,10 @@ Source: docs/tutorials/image_detection_guide.md
 
 
 def example_1_frequency_domain_signal():
-    """FrequencyDomainSignal - Recommended for Quick Screening"""
-    from veridex.image import FrequencyDomainSignal
+    """FrequencySignal - Recommended for Quick Screening"""
+    from veridex.image import FrequencySignal
 
-    detector = FrequencyDomainSignal()
+    detector = FrequencySignal()
     result = detector.run("image.png")
 
     print(f"AI Probability: {result.score:.2%}")
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     print("Image Detection Examples from Documentation")
     print("=" * 60)
     
-    print("\n### Example 1: FrequencyDomainSignal ###")
+    print("\n### Example 1: FrequencySignal ###")
     try:
         example_1_frequency_domain_signal()
     except Exception as e:

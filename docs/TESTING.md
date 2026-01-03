@@ -68,15 +68,18 @@ pytest tests/audio/ --cov=veridex.audio --cov-report=term
 
 ### Text Metrics
 - ✅ **ZlibEntropySignal** - Compression-based entropy
+- ✅ **StylometricSignal** - Linguistic feature analysis
 - ✅ **PerplexitySignal** - Perplexity and burstiness
 - ✅ **BinocularsSignal** - Contrastive perplexity (requires models)
 
 ### Image Metrics
-- ✅ **FrequencyDomainSignal** - Spectral analysis
+- ✅ **FrequencySignal** - Spectral analysis
+- ✅ **ELASignal** - Error Level Analysis
 - ✅ **DIRESignal** - Diffusion reconstruction error (requires diffusion models)
 
 ### Audio Metrics
 - ✅ **SpectralSignal** - Frequency domain analysis
+- ✅ **SilenceSignal** - Pause pattern detection
 - ✅ **Wav2VecSignal** - Foundation model detection (requires pre-trained models)
 - ✅ **AASISTSignal** - Spectro-temporal features
 

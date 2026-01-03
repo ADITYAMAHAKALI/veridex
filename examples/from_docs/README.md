@@ -47,7 +47,7 @@ from_docs/
 **Source:** `docs/tutorials/image_detection_guide.md`  
 **Count:** 3 examples
 
-- FrequencyDomainSignal (quick screening)
+- FrequencySignal (quick screening)
 - DIRESignal (high accuracy, requires GPU)
 - ELASignal (manipulation detection)
 

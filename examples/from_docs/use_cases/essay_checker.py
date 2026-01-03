@@ -15,7 +15,7 @@ class EssayChecker:
     
     def __init__(self):
         # Use high-accuracy detector for academic use
-        self.primary_detector = BinocularsSignal()
+        self.primary_detector = BinocularsSignal(observer_id="distilgpt2", performer_id="gpt2")
         self.secondary_detector = PerplexitySignal()
     
     def analyze_essay(self, essay_text):

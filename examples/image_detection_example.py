@@ -45,6 +45,37 @@ def example_frequency_domain():
             print("   Likely a real photograph")
 
 
+def example_ela():
+    """Example: Error Level Analysis (ELA) for manipulation detection."""
+    from veridex.image import ELASignal
+    
+    print("\n" + "=" * 60)
+    print("ELA Detection (Error Level Analysis)")
+    print("=" * 60)
+    
+    detector = ELASignal()
+    
+    # Analyze an image
+    image_path = "./samples/image/cat_ai.jpg" # Or any image
+    
+    result = detector.run(image_path)
+    
+    if result.error:
+         print(f"⚠️  Error: {result.error}")
+    else:
+        print(f"\nAI/Manipulation Probability: {result.score:.2f}")
+        print(f"Confidence: {result.confidence:.2f}")
+        print(f"Metrics:")
+        print(f"  Mean Difference: {result.metadata['ela_mean_diff']:.2f}")
+        print(f"  Max Difference: {result.metadata['ela_max_diff']:.2f}")
+        
+        print(f"\n💡 Interpretation:")
+        if result.score > 0.5:
+            print("   Higher error levels suggest manipulation or high-freq noise (common in AI)")
+        else:
+            print("   Consistent error levels suggest original/unmodified image")
+
+
 def example_dire():
     """Example: DIRE (Diffusion Reconstruction Error) detection."""
     from veridex.image import DIRESignal
@@ -160,8 +191,8 @@ def example_image_preprocessing():
         img.save("preprocessed.png")
         
         # Now analyze
-        from veridex.image import FrequencyDomainSignal
-        detector = FrequencyDomainSignal()
+        from veridex.image import FrequencySignal
+        detector = FrequencySignal()
         result = detector.run("preprocessed.png")
         """)
         
@@ -244,7 +275,10 @@ if __name__ == "__main__":
     # 1. Frequency domain analysis
     example_frequency_domain()
     
-    # 2. DIRE detection (requires GPU + diffusers)
+    # 2. ELA Detection (Error Level Analysis)
+    example_ela()
+    
+    # 3. DIRE detection (requires GPU + diffusers)
     # example_dire()  # Uncomment if you have a GPU
     
     # 3. Batch analysis
