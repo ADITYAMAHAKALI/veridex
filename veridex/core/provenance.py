@@ -1,4 +1,6 @@
 import os
+import json
+import mimetypes
 from typing import Any, Optional
 from veridex.core.signal import BaseSignal, DetectionResult
 
@@ -84,6 +86,28 @@ class C2PASignal(BaseSignal):
                 error=str(e)
             )
 
+        # Stream Adapter Class required for c2pa-python < 0.9.0 (e.g. 0.8.0)
+        class StreamAdapter(c2pa.Stream):
+            def __init__(self, file):
+                self.file = file
+
+            def read_stream(self, length):
+                return self.file.read(length)
+
+            def seek_stream(self, pos, mode):
+                if mode == c2pa.SeekMode.START:
+                    whence = os.SEEK_SET
+                elif mode == c2pa.SeekMode.CURRENT:
+                    whence = os.SEEK_CUR
+                elif mode == c2pa.SeekMode.END:
+                    whence = os.SEEK_END
+                else:
+                    raise ValueError(f"Unknown seek mode: {mode}")
+                return self.file.seek(pos, whence)
+
+            def write_stream(self, data):
+                return self.file.write(data)
+
         try:
             sidecar_path = self._find_sidecar(input_data)
             manifest_bytes = None
@@ -100,20 +124,57 @@ class C2PASignal(BaseSignal):
                         error=None
                     )
 
-            # Initialize Reader with or without manifest_data
-            # If manifest_bytes provided, it treats input_data as the asset to bind against.
-            with c2pa.Reader(input_data, manifest_data=manifest_bytes) as reader:
-                manifest_data = reader.get_active_manifest()
+            # Determine format
+            # c2pa expects MIME type or extension.
+            mime_type, _ = mimetypes.guess_type(input_data)
+            format_str = mime_type if mime_type else os.path.splitext(input_data)[1].lstrip('.')
+            if not format_str:
+                 # Fallback
+                format_str = "application/octet-stream" 
 
-                if not manifest_data:
+            reader = c2pa.Reader()
+            
+            with open(input_data, 'rb') as f:
+                adapter = StreamAdapter(f)
+                
+                json_result = None
+                if manifest_bytes:
+                    json_result = reader.from_manifest_data_and_stream(manifest_bytes, format_str, adapter)
+                else:
+                    json_result = reader.from_stream(format_str, adapter)
+
+                if not json_result:
+                     return DetectionResult(
+                        score=0.0,
+                        confidence=0.0,
+                        metadata={"status": "no_active_manifest"},
+                        error=None
+                    )
+                
+                parsed_data = json.loads(json_result)
+                active_manifest = parsed_data.get("active_manifest")
+
+                if not active_manifest:
                     return DetectionResult(
                         score=0.0,
                         confidence=0.0,
                         metadata={"status": "no_active_manifest"},
                         error=None
                     )
+                
+                # 'active_manifest' is an ID string, we need to find the manifest object
+                manifests = parsed_data.get("manifests", {})
+                current_manifest = manifests.get(active_manifest)
+                
+                if not current_manifest:
+                     return DetectionResult(
+                        score=0.0,
+                        confidence=0.0,
+                        metadata={"status": "active_manifest_not_found_in_store"},
+                        error=None
+                    )
 
-                assertions = manifest_data.get("assertions", [])
+                assertions = current_manifest.get("assertions", [])
 
                 # We look for AI indicators in assertions
                 is_ai = False
@@ -137,7 +198,7 @@ class C2PASignal(BaseSignal):
                         for action in actions_list:
                             ds_type = action.get("digitalSourceType", "")
                             if "trainedAlgorithmicMedia" in ds_type or "algorithmicMedia" in ds_type:
-                                is_ai = True
+                                 is_ai = True
 
                 return DetectionResult(
                     score=1.0 if is_ai else 0.0,
@@ -151,6 +212,9 @@ class C2PASignal(BaseSignal):
                 )
 
         except Exception as e:
+            # c2pa might raise errors if no manifest found in some versions/cases, 
+            # or if file format issue.
+            # Assuming if verification fails or no manifest, we land here or return above.
             return DetectionResult(
                 score=0.0,
                 confidence=0.0,
