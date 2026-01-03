@@ -1,5 +1,7 @@
 # Seeing Through the Noise: Detecting AI Images
 
+![AI Image Detection](assets/image_detection_header.png)
+
 > [!NOTE]
 > **Prerequisites:** To run the code in this guide, install the necessary dependencies:
 > ```bash
@@ -10,13 +12,13 @@ As AI image generators like Midjourney, DALL-E 3, and Stable Diffusion become mo
 
 This post explains how **Veridex** helps you uncover these hidden signals.
 
-## 1. Frequency Analysis
+## 1. Frequency Analysis: The Invisible Spectrum
 
-When you look at an image, you see pixels. But computers can also look at an image in the **frequency domain**.
+When you look at an image, you see pixels (spatial domain). But computers can also look at an image in the **frequency domain**.
 
-Real cameras capture light in a way that produces specific frequency distributions. AI models, particularly those based on Convolutional Neural Networks (CNNs) or Diffusion processes, often struggle to reproduce these natural statistics perfectly. They may introduce "checkerboard artifacts" or unusual spikes in the frequency spectrum.
+Real cameras capture light in a way that produces specific frequency distributions (1/f statistics). AI models, particularly those based on Convolutional Neural Networks (CNNs) or Diffusion processes, often struggle to reproduce these natural statistics perfectly. They may introduce "checkerboard artifacts" or unusual spikes in the frequency spectrum due to upsampling layers.
 
-**Veridex**'s `FrequencySignal` uses Fourier Transforms (FFT) to analyze the image's spectral components.
+**Veridex**'s `FrequencySignal` uses Fast Fourier Transforms (FFT) to analyze the image's spectral components.
 
 ```python
 from veridex.image import FrequencySignal
@@ -31,12 +33,22 @@ result = detector.detect("path/to/suspicious_image.jpg")
 Most modern AI image generators are **Diffusion Models**. They work by gradually removing noise from a random starting point to form an image.
 
 A clever way to detect them is to check if an image is "too easy" to reconstruct. The **DIRE** method (Diffusion Reconstruction Error) works like this:
-1. Take an input image.
-2. Add a little bit of noise to it.
-3. Ask a diffusion model to reconstruct the original image.
-4. Compare the reconstruction to the original.
+
+```mermaid
+graph LR
+    A[Input Image] --> B[Add Noise]
+    B --> C[Diffusion Model Reconstruction]
+    A --> D((Diff))
+    C --> D
+    D --> E[Error Map / Score]
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style E fill:#ccf,stroke:#333,stroke-width:2px
+```
 
 **Logic:** If the image was created by a diffusion model, the model "knows" it well and can reconstruct it very accurately (low error). If it's a real photo, the model will struggle more (high error).
+
+*   **AI Image:** Easy to reconstruct $\rightarrow$ Low Reconstruction Error.
+*   **Real Image:** Hard to reconstruct perfectly $\rightarrow$ High Reconstruction Error.
 
 **Veridex** implements this in `DIRESignal`:
 

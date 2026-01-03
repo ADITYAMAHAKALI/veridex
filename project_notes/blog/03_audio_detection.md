@@ -1,5 +1,7 @@
 # The Sound of Synthetic: AI Audio Detection
 
+![AI Audio Detection](assets/audio_detection_header.png)
+
 > [!NOTE]
 > **Prerequisites:** To run the code in this guide, install the necessary dependencies:
 > ```bash
@@ -10,13 +12,29 @@ Voice cloning and text-to-speech (TTS) technologies have advanced rapidly. Model
 
 This post covers how **Veridex** tackles the challenge of deepfake audio detection.
 
-## 1. The Physics of Sound
+## 1. The Physics of Sound: Spectral Features
 
 Synthetic audio is generated mathematically, often by vocoders (e.g., HiFi-GAN, WaveGlow). While they sound realistic to the human ear, they often fail to replicate the subtle physical nuances of a human vocal tract.
 
+### The Audio Analysis Pipeline
+
+```mermaid
+graph LR
+    A[Input Audio] --> B(Resampling)
+    B --> C[Feature Extraction]
+    C --> D{Analysis Type}
+    D -->|Signal Processing| E[Spectral Rolloff/MFCC]
+    D -->|Deep Learning| F[Wav2Vec Embeddings]
+    E --> G[Detection Score]
+    F --> G
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style G fill:#ccf,stroke:#333,stroke-width:2px
+```
+
 ### Spectral Artifacts
 In the high-frequency range, or in the phase information of the signal, generative models often leave traces.
-- **Spectral Rolloff:** How energy drops off at high frequencies.
+- **Spectral Rolloff:** The frequency below which a specified percentage (usually 85%) of the total spectral energy lies. AI models often struggle to model high-frequency dynamics accurately.
+- **MFCCs (Mel-Frequency Cepstral Coefficients):** These represent the short-term power spectrum of sound. They are essentially the "fingerprint" of the timbre.
 - **Phase Coherence:** The relationship between different frequency components.
 
 **Veridex**'s `SpectralSignal` looks for these inconsistencies.

@@ -1,5 +1,7 @@
 # Unmasking AI Text: Entropy, Perplexity, and Binoculars
 
+![AI Text Detection](assets/text_detection_header.png)
+
 > [!NOTE]
 > **Prerequisites:** To run the code in this guide, install the necessary dependencies:
 > ```bash
@@ -10,38 +12,66 @@ In the age of Large Language Models (LLMs), distinguishing between human-written
 
 This post explores the core techniques behind AI text detection and how **Veridex** implements them in a modular, easy-to-use library.
 
-## The Statistical Fingerprint of AI
+## The Theory: Statistical Fingerprints
 
-LLMs like GPT-4 are essentially probability machines. They predict the next token in a sequence based on training data. As a result, they tend to choose "safe," high-probability words. Humans, on the other hand, are chaotic. We use unexpected words, vary our sentence structures, and introduce "bursts" of complexity.
+LLMs like GPT-4 are essentially probability machines. They predict the next token in a sequence based on training data ($P(w_i | w_{1...i-1})$). As a result, they tend to choose "safe," high-probability words to maximize coherency.
 
-### 1. Entropy and Compression
+Humans, on the other hand, are chaotic. We use unexpected words, vary our sentence structures, and introduce "bursts" of complexity. This difference is what we exploit.
 
-One of the simplest ways to detect AI text is through **compression**. The idea is that AI text, being more predictable, has lower information density (entropy) and compresses better than human text.
+### Detection Pipeline
 
-**Veridex** implements this via the `ZlibEntropySignal`. It calculates the compression ratio of the text.
+The general flow of a text detector in Veridex works like this:
+
+```mermaid
+graph LR
+    A[Input Text] --> B(Tokenizer)
+    B --> C{Model / Algorithm}
+    C -->|Statistical| D[Entropy/Compression]
+    C -->|LLM-Based| E[Perplexity/Log-Likelihood]
+    D --> F[Detection Score]
+    E --> F
+    F --> G[Decision: Real vs Fake]
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style G fill:#ccf,stroke:#333,stroke-width:2px
+```
+
+## 1. Entropy and Compression
+
+One of the simplest ways to detect AI text is through **compression**. The idea is rooted in information theory.
+**Entropy** measures the unpredictability of information.
+*   **AI Text:** Highly predictable $\rightarrow$ Low Entropy $\rightarrow$ High Compression Ratio.
+*   **Human Text:** Unpredictable $\rightarrow$ High Entropy $\rightarrow$ Low Compression Ratio.
+
+**Veridex** implements this via the `ZlibEntropySignal`. It calculates the compression ratio ($Size_{compressed} / Size_{original}$).
 
 ```python
 from veridex.text import ZlibEntropySignal
 
 detector = ZlibEntropySignal()
 result = detector.detect("This is a very predictable sentence that an AI might write.")
-print(f"AI Probability: {result.score}")
+print(f"AI Probability (Low Entropy): {result.score}")
 ```
 
-### 2. Perplexity and Burstiness
+## 2. Perplexity and Burstiness
 
-**Perplexity** measures how "surprised" a model is by a piece of text.
+**Perplexity (PPL)** is the standard metric for evaluating language models. It measures how "surprised" a model is by a piece of text.
+
+$$ PPL(W) = \exp \left( - \frac{1}{N} \sum_{i=1}^N \log P(w_i | w_{<i}) \right) $$
+
 - **Low Perplexity:** The model is not surprised (likely AI).
 - **High Perplexity:** The model is surprised (likely Human).
 
-However, perplexity alone isn't enough. Humans can write simple sentences too. This is where **Burstiness** comes in. It measures the *variation* in perplexity across sentences. Humans have "bursty" writing—some simple sentences, some complex ones. AI models tend to be more uniform.
+However, perplexity alone isn't enough. Humans can write simple, low-perplexity sentences too (e.g., "The cat sat on the mat."). This is where **Burstiness** comes in. It measures the *variation* in perplexity across sentences.
+
+*   **Humans:** High Burstiness (mix of simple and complex sentences).
+*   **AI:** Low Burstiness (consistent complexity).
 
 **Veridex**'s `PerplexitySignal` (using GPT-2 or other models) computes both:
 
 ```python
 from veridex.text import PerplexitySignal
 
-# Uses GPT-2 Large by default
+# Uses GPT-2 Large by default to measure PPL
 detector = PerplexitySignal()
 result = detector.detect("The quick brown fox jumps over the lazy dog.")
 
@@ -50,9 +80,15 @@ print(f"Metadata: {result.metadata}")
 # Metadata contains 'perplexity' and 'burstiness'
 ```
 
-### 3. Advanced Detection: Binoculars
+## 3. Advanced Detection: Binoculars
 
-For more robust detection, we look at **contrastive perplexity**. The "Binoculars" method (Hans et al.) compares two different perplexity scores to distinguish AI from human text more accurately than raw perplexity. It essentially looks at the text through two different "lenses" (models) to find discrepancies characteristic of generation.
+For more robust detection, we look at **contrastive perplexity**. The "Binoculars" method (Hans et al.) compares two different perplexity scores to distinguish AI from human text more accurately than raw perplexity.
+
+It essentially looks at the text through two different "lenses":
+1.  **Observer Model:** How "human-like" does it look?
+2.  **Performer Model:** How "AI-like" does it look?
+
+The difference between these scores reveals the origin.
 
 **Veridex** provides this state-of-the-art method in `BinocularsSignal`:
 
@@ -64,10 +100,9 @@ detector = BinocularsSignal()
 result = detector.detect("A complex paragraph generated by an LLM...")
 
 print(f"Is AI? {result.score > 0.5}")
-print(f"Is AI? {result.score > 0.5}")
 ```
 
-### 4. Stylometric Analysis
+## 4. Stylometric Analysis
 
 Sometimes, we don't need a massive neural network to find AI text. Simple statistics can reveal a lot. **Stylometry** analyzes the "style" of the text, looking at features like:
 
