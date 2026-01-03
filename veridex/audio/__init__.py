@@ -13,6 +13,7 @@ from veridex.audio.wav2vec_signal import Wav2VecSignal
 from veridex.audio.aasist_signal import AASISTSignal
 from veridex.audio.breathing_signal import BreathingSignal
 from veridex.audio.silence import SilenceSignal
+from veridex.audio.provenance import C2PAAudioProvenance
 
 __all__ = [
     "SpectralSignal",
@@ -20,4 +21,5 @@ __all__ = [
     "AASISTSignal",
     "BreathingSignal",
     "SilenceSignal",
+    "C2PAAudioProvenance",
 ]

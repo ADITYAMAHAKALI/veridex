@@ -35,8 +35,7 @@ class TestC2PASignal:
                 with pytest.raises(ImportError) as exc_info:
                     signal.check_dependencies()
                 
-                assert "c2pa" in str(exc_info.value).lower()
-                assert "pip install c2pa-python" in str(exc_info.value)
+                assert "veridex[c2pa]" in str(exc_info.value)
 
     def test_check_dependencies_success(self):
         """Test dependency check when c2pa is installed."""
@@ -74,23 +73,27 @@ class TestC2PASignal:
                 assert isinstance(result, DetectionResult)
                 assert result.score == 0.0
                 assert result.confidence == 0.0
-                assert "c2pa-python not installed" in result.error
+                assert "veridex[c2pa]" in result.error
 
     def test_run_no_manifest(self):
         """Test run when file has no C2PA manifest."""
         signal = C2PASignal()
         
         mock_c2pa = MagicMock()
-        mock_c2pa.read_json.return_value = None
+        # Mock Reader to return None for from_stream
+        mock_reader = MagicMock()
+        mock_reader.from_stream.return_value = None
+        mock_c2pa.Reader.return_value = mock_reader
         
         with patch.dict('sys.modules', {'c2pa': mock_c2pa}):
-            result = signal.run("test.jpg")
+            with patch("builtins.open", new_callable=MagicMock):
+                result = signal.run("test.jpg")
             
-            assert isinstance(result, DetectionResult)
-            assert result.score == 0.0
-            assert result.confidence == 1.0
-            assert result.metadata["status"] == "no_manifest"
-            assert result.error is None
+                assert isinstance(result, DetectionResult)
+                assert result.score == 0.0
+                assert result.confidence == 0.0
+                assert result.metadata["status"] == "no_active_manifest"
+                assert result.error is None
 
     def test_run_with_string_path(self):
         """Test that run accepts string path input."""

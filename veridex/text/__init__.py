@@ -13,6 +13,7 @@ from .tdetect import TDetectSignal
 from .human_ood import HumanOODSignal
 from .binoculars import BinocularsSignal
 from .stylometry import StylometricSignal
+from .provenance import C2PATextProvenance
 
 __all__ = [
     "ZlibEntropySignal",
@@ -21,5 +22,6 @@ __all__ = [
     "TDetectSignal",
     "HumanOODSignal",
     "BinocularsSignal",
-    "StylometricSignal"
+    "StylometricSignal",
+    "C2PATextProvenance"
 ]
