@@ -11,6 +11,7 @@ copyright: Copyright &copy; 2026 Aditya Mahakali
 theme:
   name: material
   language: en
+  favicon: images/veridex_logo.png
   features:
     - navigation.tabs
     - navigation.tabs.sticky
