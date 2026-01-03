@@ -260,16 +260,6 @@ Have questions or want to contribute?
 
 ---
 
-<div class="next-steps">
-  <h3>🎯 Next Steps</h3>
-  <ol>
-    <li><a href="getting_started/">Install Veridex</a> - Get the library installed</li>
-    <li><a href="tutorials/quick_start/">Try the Quick Start</a> - Run your first detection</li>
-    <li><a href="tutorials/index/">Explore Tutorials</a> - Deep dive into each modality</li>
-    <li><a href="../CONTRIBUTING/">Join the Community</a> - Contribute to the project</li>
-  </ol>
-</div>
-
----
+**Connect with Me:** [Aditya Mahakali on LinkedIn](https://www.linkedin.com/in/aditya-mahakali-b81758168/)
 
 **Built with ❤️ for transparency in the age of generative AI**
