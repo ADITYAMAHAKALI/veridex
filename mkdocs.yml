@@ -6,7 +6,7 @@ repo_name: ADITYAMAHAKALI/veridex
 edit_uri: edit/main/docs/
 
 # Copyright
-copyright: Copyright &copy; 2024-2026 Aditya Mahakali
+copyright: Copyright &copy; 2026 Aditya Mahakali
 
 theme:
   name: material
@@ -31,22 +31,22 @@ theme:
   palette:
     # Light mode
     - scheme: default
-      primary: teal
-      accent: purple
+      primary: indigo
+      accent: cyan
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Dark mode
     - scheme: slate
-      primary: teal
-      accent: purple
+      primary: indigo
+      accent: cyan
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
   font:
     text: Roboto
     code: Roboto Mono
-  logo: images/logo.png
+  logo: images/veridex_logo.png
   icon:
     repo: fontawesome/brands/github
 

@@ -1,7 +1,7 @@
 # Veridex
 
 <div align="center">
-  <img src="docs/images/logo.png" alt="Veridex Logo" width="200"/>
+  <img src="https://raw.githubusercontent.com/ADITYAMAHAKALI/veridex/main/docs/images/veridex_logo.png" alt="Veridex Logo" width="200"/>
 </div>
 
 **A modular, probabilistic, and research-grounded AI content detection library.**
@@ -108,7 +108,7 @@ result = detector.run("suspicious_image.png")
 print(f"AI Probability: {result.score:.2f}")
 ```
 
-**👉 [See more examples in the examples/ directory](examples/)**
+**👉 [See more examples in the examples/ directory](https://github.com/ADITYAMAHAKALI/veridex/tree/main/examples)**
 
 ---
 
@@ -171,7 +171,7 @@ Each detector:
 - **[Text Detection Tutorial](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/text_detection_example.py)** - Step-by-step text analysis
 - **[Image Detection Tutorial](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/image_detection_example.py)** - Image deepfake detection
 - **[Audio Detection Tutorial](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/audio_detection_example.py)** - Voice deepfake detection
-- **[Examples Directory](https://github.com/ADITYAMAHAKALI/veridex/blob/main/examples/README.md)** - Comprehensive examples
+- **[Examples Directory](https://github.com/ADITYAMAHAKALI/veridex/tree/main/examples)** - Comprehensive examples
 
 ### 🔍 Concepts
 - **[Core Concepts](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/index.md)** - Signal-based architecture
