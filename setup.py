@@ -9,7 +9,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="veridex",
-    version="0.1.2",
+    version="0.1.4",
     author="Veridex Contributors",
     author_email="adityamahakali@aisolve.org",
     description="A modular, probabilistic, and research-grounded AI content detection library",

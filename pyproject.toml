@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "veridex"
-version = "0.1.3"
+version = "0.1.4"
 description = "A modular, probabilistic, and research-grounded AI content detection library."
 readme = "README.md"
 authors = [
