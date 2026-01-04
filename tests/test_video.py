@@ -107,4 +107,4 @@ class TestVideoSignals(unittest.TestCase):
             self.assertIn("av_distance", result.metadata)
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main() 

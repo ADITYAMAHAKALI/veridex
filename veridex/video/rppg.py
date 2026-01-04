@@ -1,8 +1,12 @@
 from typing import Any, Dict, Optional, List, Tuple
 import numpy as np
 import os
+import warnings
+import logging
 from veridex.core.signal import BaseSignal, DetectionResult
 from veridex.utils.downloads import download_file, get_cache_dir
+
+logger = logging.getLogger(__name__)
 
 class RPPGSignal(BaseSignal):
     """
@@ -45,7 +49,9 @@ class RPPGSignal(BaseSignal):
 
             # Detect and Crop Face (Track first face found)
             faces = self._detect_faces(frames)
-            if not faces or len(faces) == 0:
+            
+            # Check if faces is empty or malformed
+            if faces is None or len(faces) == 0 or (isinstance(faces, np.ndarray) and faces.size == 0):
                  return DetectionResult(
                     score=0.5,
                     confidence=0.0,
@@ -88,33 +94,12 @@ class RPPGSignal(BaseSignal):
         from veridex.video.processing import FaceDetector
         detector = FaceDetector()
 
-        # Detect on first frame to define ROI, then simple tracking/cropping
-        # For robustness, we should detect per frame, but for speed in this library, we might do per frame.
-        # RPPG requires STABLE faces.
+        # Use the built-in tracking method for temporal consistency
+        # Convert np.ndarray frames (T, H, W, C) to list for the detector
+        frame_list = [f for f in frames]
+        roi_frames = detector.track_faces(frame_list, size=(128, 128))
 
-        roi_frames = []
-        # Detection on every 10th frame and interpolation is better, but let's do per frame for correctness first.
-        # Or just detect on frame 0 and crop that region? No, movement breaks it.
-        # Let's detect every frame.
-
-        for frame in frames:
-            dets = detector.detect(frame)
-            if dets:
-                # Take largest face
-                # (x, y, w, h)
-                face = max(dets, key=lambda b: b[2] * b[3])
-                cropped = detector.extract_face(frame, face, size=(128, 128))
-                roi_frames.append(cropped)
-            else:
-                # If lost face, append zeros or last known?
-                # Appending zeros kills the signal.
-                # If we lose face, we might just stop or skip.
-                if roi_frames:
-                     roi_frames.append(roi_frames[-1]) # Repeat last
-                else:
-                     roi_frames.append(np.zeros((128, 128, 3), dtype=np.uint8))
-
-        return np.array(roi_frames) # (T, 128, 128, 3)
+        return roi_frames # (T, 128, 128, 3)
 
     def _extract_signal(self, face_frames: np.ndarray) -> np.ndarray:
         import torch
@@ -128,21 +113,36 @@ class RPPGSignal(BaseSignal):
         model = PhysNet()
         model.eval()
 
-        # Load weights
-        weights_url = "https://github.com/ADITYAMAHAKALI/veridex/releases/download/v0.1.0/physnet_dummy.pth" # Placeholder
-        weights_path = os.path.join(get_cache_dir(), "physnet.pth")
+        # Load weights from centralized config
+        from veridex.video.weights import get_weight_config
+        
+        weight_config = get_weight_config('physnet')
+        weights_url = weight_config['url']
+        weights_path = os.path.join(get_cache_dir(), weight_config['filename'])
+        sha256 = weight_config.get('sha256')
 
+        weights_loaded = False
         if not os.path.exists(weights_path):
             try:
                 download_file(weights_url, weights_path)
             except Exception:
-                pass # Fallback to random weights if download fails
+                pass  # Silently fail, final warning below will inform user
 
         if os.path.exists(weights_path):
              try:
                 model.load_state_dict(torch.load(weights_path, map_location='cpu'))
-             except:
-                pass
+                logger.info(f"✓ Loaded PhysNet weights from {weights_path}")
+                weights_loaded = True
+             except Exception:
+                pass  # Silently fail, final warning below will inform user
+        
+        if not weights_loaded:
+            warnings.warn(
+                "⚠ RPPGSignal is using untrained weights. Predictions are random.\n"
+                "For production use, download real PhysNet weights.",
+                UserWarning,
+                stacklevel=2
+            )
 
         with torch.no_grad():
              # Process in chunks if T is too large, but PhysNet is T-conv.

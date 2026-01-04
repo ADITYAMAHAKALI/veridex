@@ -1,6 +1,11 @@
 from typing import Any, Dict, Optional
 import numpy as np
+import os
+import warnings
+import logging
 from veridex.core.signal import BaseSignal, DetectionResult
+
+logger = logging.getLogger(__name__)
 
 class LipSyncSignal(BaseSignal):
     """
@@ -148,24 +153,38 @@ class LipSyncSignal(BaseSignal):
         model = SyncNet()
         model.eval()
 
-        # Load weights
-        weights_url = "http://www.robots.ox.ac.uk/~vgg/software/lipsync/data/syncnet_v2.model"
-        weights_path = os.path.join(get_cache_dir(), "syncnet_v2.pth")
+        # Load weights from centralized config
+        from veridex.video.weights import get_weight_config
+        
+        weight_config = get_weight_config('syncnet')
+        weights_url = weight_config['url']
+        weights_path = os.path.join(get_cache_dir(), weight_config['filename'])
+        sha256 = weight_config.get('sha256')
 
+        weights_loaded = False
         if not os.path.exists(weights_path):
             try:
                 download_file(weights_url, weights_path)
             except Exception:
-                pass
+                pass  # Silently fail, final warning below will inform user
 
         if os.path.exists(weights_path):
              try:
                 # Note: Official weights might be LuaTorch or different format.
                 # This assumes a PyTorch converted version or compatible dict.
-                # If mismatch, we ignore to prevent crash, effectively using random weights (untrained).
                 model.load_state_dict(torch.load(weights_path, map_location='cpu'))
-             except:
-                pass
+                logger.info(f"✓ Loaded SyncNet weights from {weights_path}")
+                weights_loaded = True
+             except Exception:
+                pass  # Silently fail, final warning below will inform user
+        
+        if not weights_loaded:
+            warnings.warn(
+                "⚠ LipSyncSignal is using untrained weights. Predictions are random.\n"
+                "For production use, download real SyncNet weights from VGG.",
+                UserWarning,
+                stacklevel=2
+            )
 
         with torch.no_grad():
             a_emb, v_emb = model(audio_t, video_t)

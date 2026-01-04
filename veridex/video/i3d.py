@@ -1,6 +1,11 @@
 from typing import Any, Dict, Optional
 import numpy as np
+import os
+import warnings
+import logging
 from veridex.core.signal import BaseSignal, DetectionResult
+
+logger = logging.getLogger(__name__)
 
 class I3DSignal(BaseSignal):
     """
@@ -73,25 +78,37 @@ class I3DSignal(BaseSignal):
         model = InceptionI3D(num_classes=1)
         model.eval()
 
-        # Load weights
+        # Load weights from centralized config
         from veridex.utils.downloads import get_cache_dir, download_file
-        import os
+        from veridex.video.weights import get_weight_config
 
-        # Using a placeholder URL. In production this should be a real checkpoint compatible with our TinyI3D.
-        weights_url = "https://github.com/ADITYAMAHAKALI/veridex/releases/download/v0.1.0/i3d_dummy.pth"
-        weights_path = os.path.join(get_cache_dir(), "i3d_rgb.pth")
+        weight_config = get_weight_config('i3d')
+        weights_url = weight_config['url']
+        weights_path = os.path.join(get_cache_dir(), weight_config['filename'])
+        sha256 = weight_config.get('sha256')
 
+        weights_loaded = False
         if not os.path.exists(weights_path):
             try:
                 download_file(weights_url, weights_path)
             except Exception:
-                pass
+                pass  # Silently fail, final warning below will inform user
 
         if os.path.exists(weights_path):
              try:
                 model.load_state_dict(torch.load(weights_path, map_location='cpu'))
-             except:
-                pass
+                logger.info(f"✓ Loaded I3D weights from {weights_path}")
+                weights_loaded = True
+             except Exception:
+                pass  # Silently fail, final warning below will inform user
+        
+        if not weights_loaded:
+            warnings.warn(
+                "⚠ I3DSignal is using untrained weights. Predictions are random.\n"
+                "For production use, download real I3D weights trained on Kinetics-400.",
+                UserWarning,
+                stacklevel=2
+            )
 
         with torch.no_grad():
             logits = model(tensor) # (1, 1, T_out)

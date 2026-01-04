@@ -108,6 +108,23 @@ result = detector.run("suspicious_image.png")
 print(f"AI Probability: {result.score:.2f}")
 ```
 
+#### Video Detection
+
+```python
+from veridex.video import VideoEnsemble
+
+# Combine multiple video signals (recommended)
+ensemble = VideoEnsemble()
+result = ensemble.run("video.mp4")
+
+print(f"AI Probability: {result.score:.2f}")
+print(f"Confidence: {result.confidence:.2f}")
+
+# View individual signal contributions
+for sig, res in result.metadata['individual_results'].items():
+    print(f"{sig}: {res['score']:.2f}")
+```
+
 **👉 [See more examples in the examples/ directory](https://github.com/ADITYAMAHAKALI/veridex/tree/main/examples)**
 
 ---
@@ -144,9 +161,15 @@ print(f"AI Probability: {result.score:.2f}")
 
 | Detector | Method | Speed | Accuracy | GPU Required | Use Case |
 |----------|--------|-------|----------|--------------|----------|
-| `RPPGSignal` | Biological (Heartbeat) | 🔄 Medium | ⭐⭐⭐ High | ❌ No | Deepfake face detection |
-| `I3DSignal` | Spatiotemporal | 🔄 Medium | ⭐⭐⭐ High | ✅ Recommended | General video deepfakes |
-| `LipSyncSignal` | Audio-Visual Sync | 🔄 Medium | ⭐⭐⭐ High | ❌ No | Dubbing/Lip-sync fakes |
+| `RPPGSignal` | Biological (Heartbeat) | 🔄 Medium | ⭐⭐⭐ High | ❌ No | Face-swap deepfakes |
+| `I3DSignal` | Spatiotemporal Motion | 🔄 Medium | ⭐⭐⭐ High | 🔶 Recommended | General video deepfakes |
+| `LipSyncSignal` | Audio-Visual Sync | 🔄 Medium | ⭐⭐⭐ High | ❌ No | Dubbing/voice cloning |
+| `VideoEnsemble` | Combines All Three | 🔄 Medium | ⭐⭐⭐⭐ Very High | 🔶 Recommended | **Production use** |
+
+> **📺 Recommended**: Use `VideoEnsemble` for robust detection. Combines RPPG, I3D, and LipSync with confidence-weighted fusion.
+> 
+> **📖 [Video Detection Guide](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/tutorials/video_detection.md)** - Comprehensive documentation
+
 
 **💡 See [Choosing the Right Detector](https://github.com/ADITYAMAHAKALI/veridex/blob/main/docs/concepts/index.md) for guidance**
 

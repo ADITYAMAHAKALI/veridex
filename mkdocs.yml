@@ -150,6 +150,7 @@ nav:
     - Text Detection Guide: tutorials/text_detection_guide.md
     - Image Detection Guide: tutorials/image_detection_guide.md
     - Audio Detection Guide: tutorials/audio_detection_guide.md
+    - Video Detection Guide: tutorials/video_detection.md
     - Ensemble Detection: tutorials/ensemble_detection.md
   
   - Concepts:
@@ -157,12 +158,14 @@ nav:
     - Text Signals: concepts/text.md
     - Image Signals: concepts/image.md
     - Audio Signals: concepts/audio.md
+    - Video Signals: concepts/video.md
   
   - API Reference:
     - Core: api/core.md
     - Text: api/text.md
     - Image: api/image.md
     - Audio: api/audio.md
+    - Video: api/video.md
   
   - Guides:
     - Use Cases: use_cases.md
