@@ -49,6 +49,13 @@ docs = [
     "mkdocs-material>=9.0.0",
     "mkdocstrings[python]>=0.24.0"
 ]
+video = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "opencv-python-headless>=4.0.0",
+    "scipy>=1.7.0",
+    "librosa>=0.10.0"
+]
 
 [project.urls]
 "Homepage" = "https://github.com/ADITYAMAHAKALI/veridex"
