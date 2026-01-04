@@ -60,9 +60,10 @@ pip install veridex
 pip install veridex[text]      # Text detection
 pip install veridex[audio]     # Audio detection
 pip install veridex[image]     # Image detection
+pip install veridex[video]     # Video detection
 
 # Install everything
-pip install veridex[text,image,audio]
+pip install veridex[text,image,audio,video]
 
 # Development installation
 pip install -e ".[dev]"

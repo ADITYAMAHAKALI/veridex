@@ -59,16 +59,40 @@ class RPPGSignal(BaseSignal):
                     error="No face detected"
                 )
 
-            # Extract BVP Signal
-            bvp_signal = self._extract_signal(faces)
+            # Extract BVP Signal - track if using trained weights
+            bvp_signal, weights_loaded = self._extract_signal(faces)
 
             # Analyze PSD
             fake_prob, meta = self._analyze_psd(bvp_signal)
+            
+            # Calculate confidence based on signal quality and model training status
+            peak_ratio = meta.get("peak_ratio", 0.0)
+            snr = meta.get("snr", 0.0)
+            
+            # Base confidence from signal quality
+            if peak_ratio > 4.0:
+                signal_confidence = 0.85  # Very strong periodic signal
+            elif peak_ratio > 3.0:
+                signal_confidence = 0.75
+            elif peak_ratio > 2.0:
+                signal_confidence = 0.65
+            elif peak_ratio > 1.5:
+                signal_confidence = 0.50
+            else:
+                signal_confidence = 0.35  # Weak/noisy signal
+            
+            # Adjust by model training status
+            if weights_loaded:
+                # Trained model: use higher portion of signal confidence
+                confidence = signal_confidence
+            else:
+                # Untrained model: significantly reduce confidence
+                confidence = min(signal_confidence * 0.3, 0.4)  # Cap at 0.4 for untrained
 
             return DetectionResult(
                 score=fake_prob,
-                confidence=0.8, # Heuristic confidence
-                metadata=meta
+                confidence=confidence,
+                metadata={**meta, "model_trained": weights_loaded}
             )
 
         except Exception as e:
@@ -101,7 +125,8 @@ class RPPGSignal(BaseSignal):
 
         return roi_frames # (T, 128, 128, 3)
 
-    def _extract_signal(self, face_frames: np.ndarray) -> np.ndarray:
+    def _extract_signal(self, face_frames: np.ndarray) -> tuple[np.ndarray, bool]:
+        """Extract BV signal and return whether trained weights were loaded."""
         import torch
         from veridex.video.models.physnet import PhysNet
 
@@ -154,7 +179,7 @@ class RPPGSignal(BaseSignal):
 
              signal = model(tensor) # (1, T)
 
-        return signal.squeeze().numpy()
+        return signal.squeeze().numpy(), weights_loaded
 
     def _analyze_psd(self, signal: np.ndarray) -> Tuple[float, Dict[str, Any]]:
         from scipy import signal as scipy_signal

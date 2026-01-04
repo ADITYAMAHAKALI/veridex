@@ -54,23 +54,28 @@ class ZlibEntropySignal(BaseSignal):
         # Typical ranges: AI text ~0.55-0.70, Human text ~0.65-0.85
         if ratio < 0.6:
             # Very compressible (repetitive) - moderate confidence it's AI
-            confidence = 0.4
             score = 0.6  # Slightly AI-leaning
         elif ratio > 0.8:
             # Not very compressible (diverse) - moderate confidence it's human
-            confidence = 0.4
             score = 0.3  # Slightly human-leaning
         else:
             # Middle range - low confidence
-            confidence = 0.2
             score = 0.5  # Neutral
+        
+        # Use distance from neutral point (0.5) as confidence indicator
+        distance_from_neutral = abs(score - 0.5)
+        
+        # Map distance to confidence
+        # Distance 0.5 (max) -> confidence ~0.45
+        # Distance 0.0 (neutral) -> confidence ~0.25
+        confidence = 0.25 + distance_from_neutral * 0.4  # Range: 0.25 to 0.45
         
         return DetectionResult(
             score=score,
             confidence=confidence,
             metadata={
-                "zlib_ratio": ratio,
-                "original_length": len(encoded),
-                "compressed_length": len(compressed)
+                "original_len": len(encoded),
+                "compressed_len": len(compressed),
+                "compression_ratio": ratio
             }
         )

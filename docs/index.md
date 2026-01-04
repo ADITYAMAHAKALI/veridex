@@ -9,13 +9,13 @@
 
 ## Welcome
 
-Veridex is a production-ready library for detecting AI-generated content across multiple modalities: **text**, **image**, and **audio**. Unlike binary classifiers, Veridex provides **probabilistic detection** with confidence estimates and **interpretable signals**.
+Veridex is a production-ready library for detecting AI-generated content across multiple modalities: **text**, **image**, **audio**, and **video**. Unlike binary classifiers, Veridex provides **probabilistic detection** with confidence estimates and **interpretable signals**.
 
 <div class="feature-grid">
 
 <div class="feature-card">
   <h3>🎯 Multi-Modal</h3>
-  <p>Detect AI-generated text, images, and audio with a unified API</p>
+  <p>Detect AI-generated text, images, audio, and video with a unified API</p>
 </div>
 
 <div class="feature-card">
@@ -94,6 +94,21 @@ Get started with Veridex in under 5 minutes:
     print(f"AI Probability: {result.score:.2f}")
     ```
 
+=== "Video Detection"
+
+    ```python
+    from veridex.video import VideoEnsemble
+    
+    # Initialize detector
+    detector = VideoEnsemble()
+    
+    # Analyze video
+    result = detector.run("video.mp4")
+    
+    print(f"AI Probability: {result.score:.2f}")
+    print(f"Confidence: {result.confidence:.2f}")
+    ```
+
 [📚 Full Installation Guide →](getting_started.md){ .md-button .md-button--primary }
 
 ---
@@ -106,11 +121,13 @@ graph LR
     B -->|Text| C[Text Signals]
     B -->|Image| D[Image Signals]
     B -->|Audio| E[Audio Signals]
-    C --> F[Normalization]
-    D --> F
-    E --> F
-    F --> G[Detection Result]
-    G --> H[Score + Confidence]
+    B -->|Video| F[Video Signals]
+    C --> G[Normalization]
+    D --> G
+    E --> G
+    F --> G
+    G --> H[Detection Result]
+    H --> I[Score + Confidence]
 ```
 
 Veridex uses a **signal-based architecture** where each detector:
@@ -143,6 +160,10 @@ Veridex uses a **signal-based architecture** where each detector:
     <strong>🎵 Audio Detection</strong><br>
     Detect voice deepfakes
   </a>
+  <a href="tutorials/video_detection/" class="quick-link">
+    <strong>🎥 Video Detection</strong><br>
+    Detect deepfake videos
+  </a>
 </div>
 
 ---
@@ -174,6 +195,15 @@ Veridex uses a **signal-based architecture** where each detector:
 | `AASISTSignal` | Spectro-Temporal | Medium | ⭐⭐⭐ | Anti-spoofing |
 | `Wav2VecSignal` | Foundation Model | Slow | ⭐⭐⭐⭐ | Production |
 | `SilenceSignal` | Pause Analysis | Fast | ⭐ | Speech patterns |
+
+### Video Detection
+
+| Signal | Method | Speed | Accuracy | Best For |
+|--------|--------|-------|----------|----------|
+| `RPPGSignal` | Biological | Medium | ⭐⭐⭐ | Face swaps |
+| `I3DSignal` | Spatiotemporal | Medium | ⭐⭐⭐ | General deepfakes |
+| `LipSyncSignal` | Audio-Visual | Medium | ⭐⭐⭐ | Dubbing |
+| `VideoEnsemble` | Fusion | Medium | ⭐⭐⭐⭐ | Production use |
 
 [📦 See All Detectors →](api/core.md){ .md-button }
 
@@ -229,6 +259,7 @@ Veridex uses a **signal-based architecture** where each detector:
     - ✅ Added `SilenceSignal` for audio detection
     - ✅ Added `StylometricSignal` for text analysis
     - ✅ Added `ELASignal` for image manipulation detection
+    - ✅ Added Video Detection support (`RPPG`, `I3D`, `LipSync`)
     - ✅ Improved test coverage to 80%+
     - ✅ Enhanced documentation with tutorials
 
@@ -254,6 +285,7 @@ Have questions or want to contribute?
 - [Text Detection Tutorial](tutorials/text_detection_guide.md)
 - [Image Detection Tutorial](tutorials/image_detection_guide.md)
 - [Audio Detection Tutorial](tutorials/audio_detection_guide.md)
+- [Video Detection Tutorial](tutorials/video_detection.md)
 - [API Reference](api/core.md)
 - [FAQ](faq.md)
 - [GitHub Repository](https://github.com/ADITYAMAHAKALI/veridex)

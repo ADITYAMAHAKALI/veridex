@@ -36,15 +36,19 @@ class LipSyncSignal(BaseSignal):
             # For robustness, we check the AV offset on multiple random 0.2s clips
 
             offsets = []
+            weights_loaded_flags = []
             for _ in range(3): # Check 3 segments
-                offset = self._calculate_av_offset(input_data)
+                offset, weights_loaded = self._calculate_av_offset(input_data)
                 if offset is not None:
                     offsets.append(offset)
+                    weights_loaded_flags.append(weights_loaded)
 
             if not offsets:
                  return DetectionResult(score=0.5, confidence=0.0, error="Could not extract AV segments")
 
             avg_offset = sum(offsets) / len(offsets)
+            offset_variance = np.var(offsets) if len(offsets) > 1 else 0.0
+            any_weights_loaded = any(weights_loaded_flags)
 
             # Metric:
             # Offset is Euclidean distance between Audio and Video embeddings.
@@ -57,17 +61,41 @@ class LipSyncSignal(BaseSignal):
             if avg_offset > threshold:
                 # Map distance to probability.
                 score = min((avg_offset - threshold) / 1.0, 1.0)
+            
+            # Calculate confidence from measurement consistency and model status
+            # Low variance in offsets = consistent measurement = high confidence
+            if offset_variance < 0.05:
+                measurement_confidence = 0.85  # Very consistent
+            elif offset_variance < 0.1:
+                measurement_confidence = 0.75
+            elif offset_variance < 0.2:
+                measurement_confidence = 0.65
+            else:
+                measurement_confidence = 0.45  # High variance, less reliable
+            
+            # Adjust by model training status
+            if any_weights_loaded:
+                confidence = measurement_confidence
+            else:
+                # Untrained model: reduce confidence significantly
+                confidence = min(measurement_confidence * 0.35, 0.4)
 
             return DetectionResult(
                 score=score,
-                confidence=0.7,
-                metadata={"av_distance": avg_offset}
+                confidence=confidence,
+                metadata={
+                    "av_distance": avg_offset,
+                    "offset_variance": offset_variance,
+                    "num_segments": len(offsets),
+                    "model_trained": any_weights_loaded
+                }
             )
 
         except Exception as e:
             return DetectionResult(score=0.0, confidence=0.0, error=str(e))
 
-    def _calculate_av_offset(self, path: str) -> Optional[float]:
+    def _calculate_av_offset(self, path: str) -> tuple[Optional[float], bool]:
+        """Calculate AV offset and return whether trained weights were loaded."""
         import torch
         import librosa
         import cv2
@@ -79,10 +107,10 @@ class LipSyncSignal(BaseSignal):
         try:
             y, sr = librosa.load(path, sr=16000)
         except Exception:
-            return None
+            return None, False
 
         if len(y) < 16000: # Need at least 1 sec to find a good chunk
-            return None
+            return None, False
 
         # Pick a random start point
         import random
@@ -117,7 +145,7 @@ class LipSyncSignal(BaseSignal):
         cap.release()
 
         if len(frames) < 5:
-            return None
+            return None, False
 
         # 3. Detect and Crop Mouth
         # Simplified: Detect face, take lower half.
@@ -127,7 +155,7 @@ class LipSyncSignal(BaseSignal):
             dets = detector.detect(frame)
             if not dets:
                 # Fallback: center crop? Or just fail this segment
-                return None
+                return None, False
 
             # Largest face
             face = max(dets, key=lambda b: b[2] * b[3])
@@ -190,4 +218,4 @@ class LipSyncSignal(BaseSignal):
             a_emb, v_emb = model(audio_t, video_t)
             dist = torch.norm(a_emb - v_emb, p=2, dim=1).item()
 
-        return dist
+        return dist, weights_loaded

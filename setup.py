@@ -9,7 +9,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="veridex",
-    version="0.1.4",
+    version="0.2.0",
     author="Veridex Contributors",
     author_email="adityamahakali@aisolve.org",
     description="A modular, probabilistic, and research-grounded AI content detection library",
@@ -63,6 +63,14 @@ setup(
             "flake8>=6.0.0",
             "mypy>=1.0.0",
             "ipython>=8.0.0",
+        ],
+        "video": [
+            "torch>=2.0.0",
+            "torchvision>=0.15.0",
+            "opencv-python-headless>=4.0.0",
+            "scipy>=1.7.0",
+            "librosa>=0.10.0",
+            "mediapipe>=0.10.0",
         ],
     },
     include_package_data=True,

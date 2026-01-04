@@ -142,14 +142,31 @@ class BinocularsSignal(BaseSignal):
             is_ai = score_val < threshold
             ai_prob = 0.9 if is_ai else 0.1
 
+            # Calculate confidence from distance to threshold
+            # Scores far from threshold indicate high confidence
+            dist_from_threshold = abs(score_val - threshold)
+            # Typical binoculars scores range from ~0.7 to ~1.1
+            # Distance > 0.1 from threshold is very confident
+            if dist_from_threshold > 0.15:
+                confidence = 0.95
+            elif dist_from_threshold > 0.1:
+                confidence = 0.88
+            elif dist_from_threshold > 0.05:
+                confidence = 0.78
+            elif dist_from_threshold > 0.02:
+                confidence = 0.65
+            else:
+                confidence = 0.50  # Very close to threshold, uncertain
+
             return DetectionResult(
                 score=ai_prob,
-                confidence=0.8,
+                confidence=confidence,
                 metadata={
                     "binoculars_score": score_val,
                     "ppl_observer": ppl_observer,
                     "ppl_performer": ppl_performer,
-                    "threshold": threshold
+                    "threshold": threshold,
+                    "distance_from_threshold": dist_from_threshold
                 }
             )
 

@@ -11,6 +11,16 @@ class DetectionResult(BaseModel):
             Range [0.0, 1.0], where 0.0 is confidently Human and 1.0 is confidently AI.
         confidence (float): A measure of the reliability of the score estimation.
             Range [0.0, 1.0], where 1.0 means the signal is fully confident in its assessment.
+            
+            Confidence interpretation:
+            - 0.0-0.3: Low confidence (heuristics, untrained models, errors)
+            - 0.4-0.6: Moderate confidence (statistical methods, limited data)
+            - 0.7-0.9: High confidence (trained models with good predictions)
+            - 0.9-1.0: Very high confidence (strong model predictions, clear patterns)
+            
+            For model-based signals, confidence is extracted from model outputs (softmax probabilities,
+            margins, etc.). For heuristic signals, confidence reflects empirical reliability.
+            
         metadata (Dict[str, Any]): Dictionary containing signal-specific intermediate values,
             features, or debug information used to derive the score.
         error (Optional[str]): Error message if the signal failed to execute.

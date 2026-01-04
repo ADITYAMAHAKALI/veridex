@@ -169,9 +169,28 @@ class DetectGPTSignal(BaseSignal):
         if math.isnan(prob):
             prob = 0.5
 
+        # Calculate confidence from measurement uncertainty
+        # Lower std of perturbations = more stable measurement = higher confidence
+        # Normalize std_p relative to typical range of log-likelihoods
+        # Typical std_p ranges from ~0.1 to ~2.0
+        if std_p < 0.2:
+            confidence = 0.9  # Very stable perturbations
+        elif std_p < 0.5:
+            confidence = 0.8  # Stable perturbations
+        elif std_p < 1.0:
+            confidence = 0.7  # Moderate stability
+        elif std_p < 2.0:
+            confidence = 0.5  # Lower stability
+        else:
+            confidence = 0.3  # High variance, low confidence
+        
+        # Boost confidence if we have many successful perturbations
+        if len(perturbed_lls) >= 15:
+            confidence = min(confidence + 0.05, 0.95)
+
         return DetectionResult(
             score=prob,
-            confidence=0.8,
+            confidence=confidence,
             metadata={
                 "original_ll": float(original_ll),
                 "perturbed_mean_ll": float(mu_p),

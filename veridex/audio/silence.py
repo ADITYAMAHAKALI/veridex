@@ -88,15 +88,31 @@ class SilenceSignal(BaseSignal):
             is_robotic_pacing = 1.0 if (len(pause_lengths) > 2 and std_pause < 0.05) else 0.0
             
             score = max(is_suspiciously_continuous, is_robotic_pacing)
+            
+            # Confidence based on amount of evidence
+            # More pauses analyzed = higher confidence
+            if len(pause_lengths) > 10:
+                base_confidence = 0.45
+            elif len(pause_lengths) > 5:
+                base_confidence = 0.4
+            else:
+                base_confidence = 0.35
+            
+            # Boost confidence if signal is strong (clear detection)
+            if score > 0.5:
+                confidence = min(base_confidence + 0.05, 0.5)
+            else:
+                confidence = base_confidence
 
             return DetectionResult(
                 score=score,
-                confidence=0.4, # Simple heuristic
+                confidence=confidence,
                 metadata={
                     "silence_ratio": float(silence_ratio),
                     "mean_pause_duration": float(mean_pause),
                     "pause_duration_std": float(std_pause),
-                    "total_duration": float(total_duration)
+                    "total_duration": float(total_duration),
+                    "num_pauses": len(pause_lengths)
                 }
             )
             

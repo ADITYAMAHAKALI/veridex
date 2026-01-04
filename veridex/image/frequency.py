@@ -120,10 +120,11 @@ class FrequencySignal(BaseSignal):
         # OR they might be overly smooth (low laplacian var).
         # This is highly model dependent.
         # For now, we return a neutral score but provide rich metadata.
+        # Confidence is low (0.3) since this is raw heuristic without trained model
 
         return DetectionResult(
             score=0.5,
-            confidence=0.1, # Low confidence as this is a raw metric
+            confidence=0.3,  # Low confidence - heuristic frequency analysis
             metadata={
                 "mean_magnitude": float(mean_magnitude),
                 "high_freq_ratio": float(high_freq_ratio),

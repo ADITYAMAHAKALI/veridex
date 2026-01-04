@@ -30,9 +30,9 @@ class FaceDetector:
                 import mediapipe as mp
                 self.backend = 'mediapipe'
                 self._init_mediapipe()
-            except ImportError:
+            except (ImportError, AttributeError):
                 warnings.warn(
-                    "MediaPipe not installed. Using Haar Cascades (lower accuracy).\n"
+                    "MediaPipe not installed or broken. Using Haar Cascades (lower accuracy).\n"
                     "For better face detection: pip install mediapipe",
                     UserWarning
                 )

@@ -34,12 +34,12 @@ def example_zlib_entropy():
     result_human = detector.run(human_text)
     print(f"\nHuman Text:")
     print(f"  AI Probability: {result_human.score:.2f}")
-    print(f"  Compression Ratio: {result_human.metadata['zlib_ratio']:.2f}")
+    print(f"  Compression Ratio: {result_human.metadata['compression_ratio']:.2f}")
     
     result_ai = detector.run(ai_text)
     print(f"\nAI-like Text:")
     print(f"  AI Probability: {result_ai.score:.2f}")
-    print(f"  Compression Ratio: {result_ai.metadata['zlib_ratio']:.2f}")
+    print(f"  Compression Ratio: {result_ai.metadata['compression_ratio']:.2f}")
 
 
 def example_stylometric():

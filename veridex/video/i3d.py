@@ -36,12 +36,42 @@ class I3DSignal(BaseSignal):
                 return DetectionResult(score=0.5, confidence=0.0, error="Video too short")
 
             # 2. Run Inference
-            score = self._run_inference(clip)
+            score, weights_loaded = self._run_inference(clip)
+            
+            # 3. Calculate confidence based on model certainty and training status
+            # Distance from 0.5 (uncertainty point) indicates model confidence
+            distance_from_uncertain = abs(score - 0.5)
+            
+            # Map distance to model confidence
+            # Distance 0.5 (max, score at 0 or 1) -> very confident
+            # Distance 0.0 (score at 0.5) -> very uncertain
+            model_confidence = min(distance_from_uncertain * 2, 1.0)  # Scale to [0, 1]
+            
+            # Boost base confidence for I3D (sophisticated spatiotemporal model)
+            if model_confidence > 0.7:
+                base_confidence = 0.90
+            elif model_confidence > 0.5:
+                base_confidence = 0.85
+            elif model_confidence > 0.3:
+                base_confidence = 0.75
+            else:
+                base_confidence = 0.65
+            
+            # Adjust by training status
+            if weights_loaded:
+                confidence = base_confidence
+            else:
+                # Untrained weights: very low confidence
+                confidence = min(base_confidence * 0.15, 0.25)
 
             return DetectionResult(
                 score=score,
-                confidence=0.9,
-                metadata={"frames": 64}
+                confidence=confidence,
+                metadata={
+                    "frames": 64,
+                    "model_confidence": model_confidence,
+                    "model_trained": weights_loaded
+                }
             )
 
         except Exception as e:
@@ -66,7 +96,8 @@ class I3DSignal(BaseSignal):
 
         return np.array(frames) # (T, H, W, C)
 
-    def _run_inference(self, clip: np.ndarray) -> float:
+    def _run_inference(self, clip: np.ndarray) -> tuple[float, bool]:
+        """Run I3D inference and return score and whether trained weights were loaded."""
         import torch
         from veridex.video.models.i3d import InceptionI3D
 
@@ -104,7 +135,7 @@ class I3DSignal(BaseSignal):
         
         if not weights_loaded:
             warnings.warn(
-                "⚠ I3DSignal is using untrained weights. Predictions are random.\n"
+                "⚠ I3DSignal is using untrained weights. Predictions are random.\\n"
                 "For production use, download real I3D weights trained on Kinetics-400.",
                 UserWarning,
                 stacklevel=2
@@ -116,4 +147,4 @@ class I3DSignal(BaseSignal):
             logit = logits.mean()
             prob = torch.sigmoid(logit).item()
 
-        return prob
+        return prob, weights_loaded
