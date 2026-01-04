@@ -7,7 +7,7 @@ independent 'signals' (detectors) analyze content and return probabilistic score
 along with interpretable metadata.
 
 Key Features:
-    - Multi-modal support (Text, Image, Audio)
+    - Multi-modal support (Text, Image, Audio, Video)
     - modular 'Signal' architecture
     - Probabilistic outputs with confidence scores
     - Research-grounded detection methods
