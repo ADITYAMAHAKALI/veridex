@@ -9,6 +9,7 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ADITYAMAHAKALI/veridex/blob/main/LICENSE)
 [![PyPI version](https://img.shields.io/badge/pypi-veridex-blue)](https://pypi.org/project/veridex/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/veridex?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/veridex)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://adityamahakali.github.io/veridex/)
 
 Veridex is a production-ready library for detecting AI-generated content across multiple modalities: **text**, **image**, and **audio**. Unlike binary classifiers, Veridex provides probabilistic detection with confidence estimates and interpretable signals.
