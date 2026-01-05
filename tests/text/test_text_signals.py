@@ -38,7 +38,7 @@ class TestTextSignals(unittest.TestCase):
              # run() should catch the ImportError and return error in result
              result = signal.run("test")
              self.assertIsNotNone(result.error)
-             self.assertIn("required for PerplexitySignal", result.error)
+             self.assertIn("PerplexitySignal requires", result.error)
 
     def test_perplexity_success_mocked(self):
         # Create mock modules
@@ -59,6 +59,8 @@ class TestTextSignals(unittest.TestCase):
 
         # Mock tokenizer call
         mock_inputs = {"input_ids": MagicMock(), "attention_mask": MagicMock()}
+        # Ensure shape[1] is >= 2 so it doesn't return early
+        mock_inputs["input_ids"].shape = [1, 10]
         mock_tokenizer.return_value = mock_inputs
 
         # Mock model call
