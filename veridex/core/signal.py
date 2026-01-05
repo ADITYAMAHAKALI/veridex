@@ -6,6 +6,9 @@ class DetectionResult(BaseModel):
     """
     Standardized output model for all detection signals.
 
+    This model encapsulates the result of a detection signal, providing a normalized score,
+    a confidence level, and optional metadata or error information.
+
     Attributes:
         score (float): Normalized probability score indicating AI-likelihood.
             Range [0.0, 1.0], where 0.0 is confidently Human and 1.0 is confidently AI.
@@ -25,6 +28,17 @@ class DetectionResult(BaseModel):
             features, or debug information used to derive the score.
         error (Optional[str]): Error message if the signal failed to execute.
             If present, `score` and `confidence` should be treated as invalid or default.
+
+    Example:
+        ```python
+        result = DetectionResult(
+            score=0.95,
+            confidence=0.98,
+            metadata={"burstiness": 12.5, "perplexity": 5.2}
+        )
+        if result.score > 0.5:
+            print("Likely AI-generated")
+        ```
     """
     score: float = Field(..., ge=0.0, le=1.0, description="Normalized score indicating AI probability. 0=Human, 1=AI.")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Reliability of the score estimation.")
@@ -62,7 +76,7 @@ class BaseSignal(ABC):
         Data type this signal operates on.
         
         Returns:
-            str: One of 'text', 'image', 'audio'.
+            str: One of 'text', 'image', 'audio', 'video'.
         """
         pass
 
@@ -72,8 +86,11 @@ class BaseSignal(ABC):
         Execute the detection logic on the provided input.
 
         Args:
-            input_data (Any): The content to analyze. Type should match `self.dtype` expectations
-                (e.g., str for 'text', path or numpy array for 'image/audio').
+            input_data (Any): The content to analyze. Type should match `self.dtype` expectations:
+                - 'text': `str`
+                - 'image': `str` (path), `PIL.Image.Image`, or `numpy.ndarray`
+                - 'audio': `str` (path) or `numpy.ndarray` (waveform)
+                - 'video': `str` (path)
 
         Returns:
             DetectionResult: The result containing score, confidence, and metadata.
@@ -90,3 +107,18 @@ class BaseSignal(ABC):
             ImportError: If required extra dependencies (e.g., torch, transformers) are missing.
         """
         pass
+
+    def detect(self, input_data: Any) -> DetectionResult:
+        """
+        Public alias for `run()`.
+
+        It is recommended to use this method instead of `run()` directly, as it may include
+        future pre/post-processing steps.
+
+        Args:
+            input_data (Any): The content to analyze.
+
+        Returns:
+            DetectionResult: The detection result.
+        """
+        return self.run(input_data)

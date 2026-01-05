@@ -1,47 +1,48 @@
-from typing import Any
+from typing import Any, Optional
 import math
+import numpy as np
 from veridex.core.signal import BaseSignal, DetectionResult
 
 class PerplexitySignal(BaseSignal):
     """
-    Detects AI content using Perplexity and Burstiness metrics.
+    Analyzes text complexity using Perplexity metrics.
 
-    This signal uses a pre-trained causal language model (default: GPT-2) to calculate
-    the perplexity (surprise) of the text.
+    This signal assumes that AI-generated text tends to have lower perplexity (more predictable)
+    compared to human-written text.
 
-    Metrics:
-        - Perplexity: Exponential of the average negative log-likelihood per token.
-          Lower perplexity indicates the text is more predictable to the model (likely AI).
-        - Burstiness: The standard deviation of perplexity across sentences.
-          AI text tends to have consistent perplexity (low burstiness), while human writing varies.
-
-    Dependencies:
-        Requires `transformers`, `torch`, and optionally `nltk` for sentence splitting.
+    **Mechanism**:
+    1.  Tokenize input text using a pretrained tokenizer (e.g., GPT-2).
+    2.  Calculate perplexity using the corresponding language model.
+    3.  Map perplexity to an AI probability score using a logistic function.
+        - Low perplexity -> High AI Probability.
+        - High perplexity -> Low AI Probability (Human).
 
     Attributes:
-        name (str): 'perplexity_burstiness'
-        dtype (str): 'text'
-        model_id (str): HuggingFace model identifier.
+        model_name (str): Name of the underlying model (default: "gpt2").
+        device (Optional[str]): Device to run model on ('cpu', 'cuda').
     """
 
-    def __init__(self, model_id: str = "gpt2"):
+    def __init__(self, model_name: str = "gpt2", device: Optional[str] = None):
         """
         Initialize the Perplexity signal.
 
         Args:
-            model_id (str): The HuggingFace model ID to use for calculation.
-                            Defaults to 'gpt2' (fast, reasonable baseline).
+            model_name (str): Identifier for the model used to calculate perplexity.
+            device (Optional[str]): Device to run model on.
         """
-        self.model_id = model_id
+        self.model_name = model_name
+        self._device = device
         self._model = None
         self._tokenizer = None
 
     @property
     def name(self) -> str:
-        return "perplexity_burstiness"
+        """Returns 'perplexity'."""
+        return "perplexity"
 
     @property
     def dtype(self) -> str:
+        """Returns 'text'."""
         return "text"
 
     def check_dependencies(self) -> None:
@@ -50,8 +51,8 @@ class PerplexitySignal(BaseSignal):
             import transformers
         except ImportError:
             raise ImportError(
-                "The 'text' extra dependencies (transformers, torch) are required for PerplexitySignal. "
-                "Install them with `pip install veridex[text]`."
+                "PerplexitySignal requires 'torch' and 'transformers'. "
+                "Install with `pip install veridex[text]`"
             )
 
     def _load_model(self):
@@ -59,135 +60,71 @@ class PerplexitySignal(BaseSignal):
             return
 
         self.check_dependencies()
-
-        # Local import to avoid top-level dependency
-        from transformers import AutoModelForCausalLM, AutoTokenizer
         import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
 
-        # Use CPU by default for broader compatibility in this context
-        device = "cpu"
-        if torch.cuda.is_available():
-            device = "cuda"
+        if self._device is None:
+            self._device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        self._device = device
-        self._tokenizer = AutoTokenizer.from_pretrained(self.model_id)
-        self._model = AutoModelForCausalLM.from_pretrained(self.model_id).to(device)
-
-    def _split_sentences(self, text: str) -> list[str]:
-        try:
-            import nltk
-            try:
-                nltk.data.find('tokenizers/punkt')
-            except LookupError:
-                nltk.download('punkt', quiet=True)
-            return nltk.sent_tokenize(text)
-        except ImportError:
-            # Fallback to simple splitting if nltk is not available
-            import re
-            return re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
+        self._tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self._model = AutoModelForCausalLM.from_pretrained(self.model_name).to(self._device)
+        self._model.eval()
 
     def run(self, input_data: Any) -> DetectionResult:
-        if not isinstance(input_data, str):
-            return DetectionResult(
-                score=0.0,
-                confidence=0.0,
-                metadata={},
-                error="Input must be a string."
-            )
+        """
+        Calculate perplexity and convert to an AI score.
 
-        if not input_data:
-             return DetectionResult(
-                score=0.0,
-                confidence=0.0,
-                metadata={},
-                error="Input string is empty."
-            )
+        Args:
+            input_data (str): Text to analyze.
+
+        Returns:
+            DetectionResult:
+                - score: 0.0-1.0 AI probability.
+                - metadata: {'mean_perplexity', 'model_id'}.
+        """
+        if not isinstance(input_data, str):
+             return DetectionResult(score=0.0, confidence=0.0, error="Input must be a string")
 
         try:
             self._load_model()
-        except ImportError as e:
-            return DetectionResult(
-                score=0.0,
-                confidence=0.0,
-                metadata={},
-                error=str(e)
-            )
-        except Exception as e:
-            return DetectionResult(
-                score=0.0,
-                confidence=0.0,
-                metadata={},
-                error=f"Failed to load model '{self.model_id}': {e}"
+            import torch
+
+            # Tokenize with truncation to max length (usually 1024 for GPT-2)
+            # This prevents crashes on long text.
+            inputs = self._tokenizer(
+                input_data,
+                return_tensors="pt",
+                truncation=True,
+                max_length=1024
             )
 
-        import torch
-        import numpy as np
+            if inputs["input_ids"].shape[1] < 2:
+                 # Too short for meaningful perplexity
+                 return DetectionResult(score=0.5, confidence=0.0, metadata={"reason": "Text too short"})
 
-        try:
-            sentences = self._split_sentences(input_data)
-            # If no sentences found (e.g. empty or weird text), treat whole text as one
-            if not sentences:
-                sentences = [input_data]
+            inputs = {k: v.to(self._device) for k, v in inputs.items()}
 
-            perplexities = []
+            with torch.no_grad():
+                outputs = self._model(**inputs, labels=inputs["input_ids"])
+                loss = outputs.loss
+                perplexity = torch.exp(loss).item()
 
-            for sentence in sentences:
-                # Skip empty sentences
-                if not sentence.strip():
-                    continue
-
-                inputs = self._tokenizer(sentence, return_tensors="pt")
-                inputs = {k: v.to(self._device) for k, v in inputs.items()}
-
-                with torch.no_grad():
-                    outputs = self._model(**inputs, labels=inputs["input_ids"])
-                    loss = outputs.loss
-                    ppl = torch.exp(loss).item()
-                    perplexities.append(ppl)
-
-            if not perplexities:
-                 return DetectionResult(
-                    score=0.0,
-                    confidence=0.0,
-                    metadata={},
-                    error="Could not calculate perplexity for any sentence."
-                )
-
-            mean_perplexity = float(np.mean(perplexities))
-            burstiness = float(np.std(perplexities)) if len(perplexities) > 1 else 0.0
-
-            # Heuristic Scoring (Experimental)
-            # Research suggests AI text has lower perplexity and lower burstiness.
-            # We define a simple probability mapping.
-            # Note: Thresholds are arbitrary and need calibration on real datasets.
-            # GPT-2 Output approx: PPL ~ 10-20. Human: PPL ~ 40-100+.
-
-            # Simple logistic-like decay for score based on PPL
-            # If PPL is low (<30), probability of AI is high.
-            # If PPL is high (>80), probability of AI is low.
-
-            # We use a threshold of 50 for perplexity as a midpoint.
-            ppl_score = 1.0 / (1.0 + math.exp((mean_perplexity - 50) / 10))
-
-            # Burstiness acts as a modifier? Or just a separate signal?
-            # For now, let's keep the score based mainly on Perplexity but return both metrics.
-            # AI = Low Burstiness.
+            # Heuristic mapping from Perplexity to AI Score
+            # Threshold = 50. If PPL < 50, P(AI) > 0.5.
+            threshold = 50.0
+            scale = 10.0
+            score = 1.0 / (1.0 + np.exp((perplexity - threshold) / scale))
 
             return DetectionResult(
-                score=ppl_score,
-                confidence=0.6, # Moderate confidence as this is a heuristic
+                score=float(score),
+                confidence=0.7,
                 metadata={
-                    "mean_perplexity": mean_perplexity,
-                    "burstiness": burstiness,
-                    "sentence_count": len(sentences),
-                    "model_id": self.model_id
+                    "mean_perplexity": perplexity,
+                    "model_id": self.model_name
                 }
             )
 
+        except ImportError as e:
+            return DetectionResult(score=0.0, confidence=0.0, error=str(e))
         except Exception as e:
-            return DetectionResult(
-                score=0.0,
-                confidence=0.0,
-                metadata={},
-                error=f"Error calculating perplexity/burstiness: {e}"
-            )
+             return DetectionResult(score=0.0, confidence=0.0, error=str(e))

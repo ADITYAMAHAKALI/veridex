@@ -8,19 +8,20 @@ class BinocularsSignal(BaseSignal):
     This advanced detection strategy compares the perplexity of two models forms a ratio:
     an 'Observer' model and a 'Performer' model.
 
-    Formula:
-        Score = log(PPL_Observer) / log(PPL_Performer)
+    **Formula**:
+    `Score = log(PPL_Observer) / log(PPL_Performer)`
 
-    Interpretation:
-        If the score is below a certain threshold (typically ~0.90), the text is considered
-        AI-generated. This method is considered state-of-the-art for zero-shot detection.
+    **Interpretation**:
+    If the score is below a certain threshold (typically ~0.90), the text is considered
+    AI-generated. This method is considered state-of-the-art for zero-shot detection.
 
-    References:
-        "Spotting LLMs With Binoculars: Zero-Shot Detection of Machine-Generated Text" (arXiv:2401.12070)
+    **Reference**:
+    "Spotting LLMs With Binoculars: Zero-Shot Detection of Machine-Generated Text" (arXiv:2401.12070)
 
     Attributes:
-        name (str): 'binoculars'
-        dtype (str): 'text'
+        observer_id (str): HuggingFace ID for the observer model.
+        performer_id (str): HuggingFace ID for the performer model.
+        use_mock (bool): If True, returns dummy results without loading models (for testing).
     """
 
     def __init__(self, observer_id: str = "tiiuae/falcon-7b-instruct", performer_id: str = "tiiuae/falcon-7b", use_mock: bool = False):
@@ -41,10 +42,12 @@ class BinocularsSignal(BaseSignal):
 
     @property
     def name(self) -> str:
+        """Returns 'binoculars'."""
         return "binoculars"
 
     @property
     def dtype(self) -> str:
+        """Returns 'text'."""
         return "text"
 
     def check_dependencies(self) -> None:
@@ -101,6 +104,17 @@ class BinocularsSignal(BaseSignal):
             return torch.exp(outputs.loss).item()
 
     def run(self, input_data: Any) -> DetectionResult:
+        """
+        Execute Binoculars detection.
+
+        Args:
+            input_data (str): Text to analyze.
+
+        Returns:
+            DetectionResult:
+                - score: Probability of AI generation.
+                - metadata: 'binoculars_score', 'threshold', 'distance_from_threshold'.
+        """
         if not isinstance(input_data, str):
             return DetectionResult(score=0.0, confidence=0.0, metadata={}, error="Input must be a string.")
 
