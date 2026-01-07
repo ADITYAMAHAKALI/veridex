@@ -66,14 +66,69 @@ def example_ela():
         print(f"\nAI/Manipulation Probability: {result.score:.2f}")
         print(f"Confidence: {result.confidence:.2f}")
         print(f"Metrics:")
-        print(f"  Mean Difference: {result.metadata['ela_mean_diff']:.2f}")
-        print(f"  Max Difference: {result.metadata['ela_max_diff']:.2f}")
+        print(f"  Mean Difference: {result.metadata.get('ela_mean_diff', 0):.2f}")
+        print(f"  Max Difference: {result.metadata.get('ela_max_diff', 0):.2f}")
         
         print(f"\n💡 Interpretation:")
         if result.score > 0.5:
             print("   Higher error levels suggest manipulation or high-freq noise (common in AI)")
         else:
             print("   Consistent error levels suggest original/unmodified image")
+
+
+def example_mlep():
+    """Example: MLEP (Multi-scale Local Entropy) detection."""
+    from veridex.image import MLEPSignal
+
+    print("\n" + "=" * 60)
+    print("MLEP Detection (Local Entropy)")
+    print("=" * 60)
+
+    detector = MLEPSignal()
+
+    image_path = "./samples/image/cat_ai.jpg"
+
+    result = detector.run(image_path)
+
+    if result.error:
+        print(f"⚠️  Error: {result.error}")
+        print("   Requires scikit-image and scipy.")
+    else:
+        print(f"\nAI Probability: {result.score:.2f}")
+        print(f"Confidence: {result.confidence:.2f}")
+        print(f"Metrics:")
+        print(f"  Mean Entropy: {result.metadata.get('mean_entropy', 0):.2f}")
+        print(f"  Entropy Variance: {result.metadata.get('var_entropy', 0):.2f}")
+
+        print(f"\n💡 Interpretation:")
+        print("   AI generators often leave consistent local entropy signatures.")
+
+
+def example_clip():
+    """Example: CLIP-based Zero-Shot Detection."""
+    from veridex.image import CLIPSignal
+
+    print("\n" + "=" * 60)
+    print("CLIP Detection (Semantic Analysis)")
+    print("=" * 60)
+
+    # Initialize (downloads model)
+    detector = CLIPSignal()
+
+    image_path = "./samples/image/cat_ai.jpg"
+
+    result = detector.run(image_path)
+
+    if result.error:
+        print(f"⚠️  Error: {result.error}")
+        print("   Requires torch and transformers.")
+    else:
+        print(f"\nAI Probability: {result.score:.2f}")
+        print(f"Confidence: {result.confidence:.2f}")
+        print(f"Top Prompt: {result.metadata.get('top_prompt', 'N/A')}")
+
+        print(f"\n💡 Interpretation:")
+        print("   Uses CLIP to check if image is semantically closer to 'AI generated' prompts.")
 
 
 def example_dire():
@@ -201,31 +256,6 @@ def example_image_preprocessing():
         print("   Install: pip install veridex[image]")
 
 
-def example_watermark_detection():
-    """Example: Detecting watermarks (future feature)."""
-    print("\n" + "=" * 60)
-    print("Watermark Detection (Planned Feature)")
-    print("=" * 60)
-    
-    print("\n🚧 Coming Soon:")
-    print("  • Invisible watermark detection (DWT/DCT)")
-    print("  • Stable Signature extraction")
-    print("  • C2PA manifest verification")
-    
-    print("\n💡 Current Workaround:")
-    print("  Use frequency analysis to detect some watermarks:")
-    print("""
-    from veridex.image import FrequencySignal
-    
-    detector = FrequencySignal()
-    result = detector.run("watermarked_image.png")
-    
-    # Watermarks may show up as frequency anomalies
-    if result.metadata.get('high_freq_anomaly', 0) > threshold:
-        print("Possible watermark detected")
-    """)
-
-
 def example_comparison():
     """Example: Comparing real vs AI-generated images."""
     print("\n" + "=" * 60)
@@ -278,19 +308,22 @@ if __name__ == "__main__":
     # 2. ELA Detection (Error Level Analysis)
     example_ela()
     
-    # 3. DIRE detection (requires GPU + diffusers)
-    # example_dire()  # Uncomment if you have a GPU
+    # 3. MLEP Detection
+    example_mlep()
+
+    # 4. CLIP Detection (requires heavy models)
+    # example_clip()
+
+    # 5. DIRE detection (requires GPU + diffusers)
+    # example_dire()
     
-    # 3. Batch analysis
+    # 6. Batch analysis
     example_multi_image_analysis()
     
-    # 4. Preprocessing tips
+    # 7. Preprocessing tips
     example_image_preprocessing()
     
-    # 5. Watermark detection (planned)
-    example_watermark_detection()
-    
-    # 6. Comparison guide
+    # 8. Comparison guide
     example_comparison()
     
     print("\n" + "=" * 60)
