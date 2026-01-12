@@ -36,6 +36,9 @@ setup(
         "pydantic>=2.0.0",
     ],
     extras_require={
+        "c2pa": [
+            "c2pa-python>=0.8.0,<0.9.0",
+        ],
         "text": [
             "transformers>=4.30.0",
             "torch>=2.0.0",
