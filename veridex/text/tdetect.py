@@ -33,16 +33,17 @@ class TDetectSignal(DetectGPTSignal):
         if not input_data or not isinstance(input_data, str):
             return DetectionResult(score=0.0, confidence=0.0, error="Invalid input")
 
-        self._load_models()
+        self._load_base_model()
+        self._load_perturb_model()
 
-        original_ll = self._get_ll(input_data)
-        perturbations = self._perturb_text_flan(input_data)
+        original_ll = self._get_log_prob(input_data)
+        perturbations = self._perturb_text(input_data)
 
         perturbed_lls = []
         for p_text in perturbations:
             if not p_text.strip():
                 continue
-            ll = self._get_ll(p_text)
+            ll = self._get_log_prob(p_text)
             perturbed_lls.append(ll)
 
         if not perturbed_lls:

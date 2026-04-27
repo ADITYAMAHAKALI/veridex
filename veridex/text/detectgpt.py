@@ -72,8 +72,8 @@ class DetectGPTSignal(BaseSignal):
 
     @property
     def name(self) -> str:
-        """Returns 'detect_gpt'."""
-        return "detect_gpt"
+        """Returns 'detectgpt'."""
+        return "detectgpt"
 
     @property
     def dtype(self) -> str:
@@ -151,8 +151,8 @@ class DetectGPTSignal(BaseSignal):
                 - score: 0.0 (Human) to 1.0 (AI).
                 - metadata: Contains 'curvature', 'original_log_prob'.
         """
-        if not isinstance(input_data, str):
-             return DetectionResult(score=0.0, confidence=0.0, error="Input must be a string", metadata={})
+        if not input_data or not isinstance(input_data, str):
+             return DetectionResult(score=0.0, confidence=0.0, error="Invalid input", metadata={})
 
         try:
             original_log_prob = self._get_log_prob(input_data)
